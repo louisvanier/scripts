@@ -74,7 +74,7 @@ class RemoveBandNameRule < BaseRule
     log
     return if /^#{Regexp.escape(@renamer.band_name)}( [IVX]{1,2}| \d{1})?$/i =~ input
     # remove band name
-    input.gsub!(/#{Regexp.escape(@renamer.band_name)}[^\w]/i, '')
+    input.gsub!(/([^\w]|^)#{Regexp.escape(@renamer.band_name)}[^\w]/i, '')
   end
 end
 
@@ -82,15 +82,13 @@ class RemoveAlbumNameRule < BaseRule
   def apply!
     log
     return if /^\d{2}\. #{Regexp.escape(@renamer.album_name)} ?([IVX]{1,2}|\d{1})?\.(mp3|aac|ogg|flac)/i =~ input
-    input.gsub!(/#{Regexp.escape(@renamer.album_name)}/i, '')
+    input.gsub!(/([^\w]|^)#{Regexp.escape(@renamer.album_name)}([^\w]|^)/i, '')
   end
 end
 
 class UnderscoreToSpacesRule < BaseRule
   def apply!
     log
-    logger.info(@renamer.input)
-    logger.info(input)
     input.gsub!('_', ' ')
   end
 end
@@ -99,16 +97,20 @@ class RemoveYearRule < BaseRule
   def apply!
     return if input =~ /^\d{4}$/ # its already only a year, i.e. Rush - 2112, or the band 1349
     log
-    year_found = input.scan(/\s*[\(\[]*\s*([12]\d{3})\s*[\)\]]*\s*/)&.flatten&.last&.to_i
+    year_found = input.scan(/([^\w]+|^)((19|20)\d{2})([^\w]+|$)/)&.flatten&.last&.to_i
+    year_found = input.scan(/\(((19|20)\d{2})\)/)&.flatten&.last&.to_i if year_found.nil?
+    year_found = input.scan(/\[((19|20)\d{2})\]/)&.flatten&.last&.to_i if year_found.nil?
     @renamer.album_year = year_found unless year_found.nil?
-    input.gsub!(/([\(\[]\s*)*[12]\d{3}\s*[\)\]]*/, '')
+    input.gsub!(/\s+((19|20)\d{2})\s+/)
+    input.gsub!(/\(((19|20)\d{2})\)/)
+    input.gsub!(/\[((19|20)\d{2})\]/)
   end
 end
 
 class NormalizeTrackNumberule < BaseRule
   def apply!
     log
-    input.gsub!(/-?(\d{1,3})[^\d\.\w]/,'\1. ')
+    input.gsub!(/[^\d\w](\d{1,3})[^\d\.\w]/,'\1. ')
   end
 end
 
@@ -194,11 +196,12 @@ class BandRenamer
   def initialize(band_folder_path:, dry_run:, rules: default_rules)
     @rules = rules
     @band_folder_path = Pathname.new(band_folder_path)
+    @input = @band_folder_path.basename.to_s
     @dry_run = dry_run
   end
 
   def sanitize
-    @band_name = input = @band_folder_path.basename.to_s
+    @band_name = input
     actual_rules.each(&:apply!)
 
     logger.info "#{@band_name}"
@@ -254,12 +257,12 @@ class AlbumRenamer
   def initialize(album_folder_path:, band_name:, dry_run:, rules: default_rules)
     @rules = rules
     @album_folder_path = Pathname.new(album_folder_path)
+    @input = @album_folder_path.basename.to_s
     @band_name = band_name
     @dry_run = dry_run
   end
 
   def sanitize
-    input = @album_folder_path.basename.to_s
     actual_rules.each(&:apply!)
 
     logger.info("   FOUND YEAR IN ALBUM NAME => #{album_year}") if @album_year
@@ -275,7 +278,7 @@ class AlbumRenamer
     end
     sanitize_songs(input)
 
-    sanitized
+   input
   end
 
   def write_metadata(album_name)
@@ -293,7 +296,7 @@ class AlbumRenamer
 
   def sanitize_songs(sanitized_album)
     Dir.each_child(@album_folder_path) do |song|
-      next unless /(mp3|aac|ogg|flac)$/ =~ song  
+      next unless /(mp3|aac|ogg|flac)$/ =~ song
       renamer = ::SongRenamer.new(song_path: File.join(@album_folder_path, song), album_name: sanitized_album, band_name: @band_name, dry_run: @dry_run)
       sanitized = renamer.sanitize
     end
@@ -303,7 +306,7 @@ end
 class SongRenamer
   include Logging
 
-  attr_accessor :track_number, :album_name, :input
+  attr_accessor :track_number, :album_name, :album_year, :input
   attr_reader :album_path, :band_name
 
   def default_rules
@@ -312,6 +315,7 @@ class SongRenamer
       NormalizeTrackNumberule,
       RemoveBandNameRule,
       RemoveAlbumNameRule,
+      RemoveYearRule,
       RemoveEmptySeparatorsRule,
       BracketsToParenthesesRule,
       RemoveEmptySeparatorsRule,
@@ -322,24 +326,24 @@ class SongRenamer
   def initialize(song_path:, album_name:, band_name:, dry_run:, rules: default_rules)
     @rules = rules
     @song_path = Pathname.new(song_path)
+    @input = @song_path.basename.to_s
     @album_name = album_name
     @band_name = band_name
     @dry_run = dry_run
   end
 
   def sanitize
-    song_name = input = @song_path.basename.to_s
     actual_rules.each(&:apply!)
 
     logger.info("       TRACK NUMBER => #{track_number}") if @track_number
-    if song_name != @song_path.basename.to_s
-      logger.info "       #{@song_path.basename.to_s} ---> #{song_name}"
+    if input != @song_path.basename.to_s
+      logger.info "       #{@song_path.basename.to_s} ---> #{input}"
       unless @dry_run
-        FileUtils.mv(@song_path, "#{@song_path.dirname}/#{song_name}")
+        FileUtils.mv(@song_path, "#{@song_path.dirname}/#{input}")
       end
     end
 
-    song_name
+    input
   end
 
   private

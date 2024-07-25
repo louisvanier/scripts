@@ -2,6 +2,6 @@
 #
 guard :shell do
 	watch('rename_music.rb') do |m|
-		system("ruby #{m[0]} -p /mnt/nas_music -f '[Gg]*' -d INFO")
+		system("ruby #{m[0]} -p /mnt/nas_music -f '[Gg]os*' -d DEBUG")
 	end
 end
