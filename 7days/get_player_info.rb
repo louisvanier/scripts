@@ -27,24 +27,28 @@ class SevenDaysPlayer
     @odd_shits = {}
     @attributes = {}
     @hashes = []
+    @shits_before_name = []
   end
 
   def parse_save_file
     while !@reader.eof?
+      while @player_name.nil?
+        str = @reader.get_str
+        if str =~ /(vanier|Elvis|sauvage|2000)/
+          @player_name = str
+          @name_ofs = @reader.ofs
+        end
+      end
       c = @reader.get(1)
       if c.ord == 123 # {
         @hashes << @reader.get_hash
       else 
         str = c + @reader.get_str
-        if str =~ /(vanier|Elvis|sauvage|ironbo)/
-          @player_name = str
-          @name_ofs = @reader.ofs
-        end
         if str =~ /crafting/
           # HMMM, is our last character outside of a-z?
           if str[-1].ord < 97 || str[-1].ord > 122
             skill_level = @reader.get(1, @reader.ofs - 2).ord          
-            @crafting_skills[str.gsub(/crafting/, '')] = skill_level if skill_level > 1
+            @crafting_skills[str[0..-2].gsub(/crafting/, '')] = skill_level if skill_level > 1
           else
             skill_level = @reader.get(1, @reader.ofs - 1).ord
             @crafting_skills[str.gsub(/crafting/, '')] = skill_level if skill_level > 1
@@ -76,7 +80,7 @@ class SevenDaysPlayer
 
   def show_stuff
     puts "\n"
-    puts @player_name
+    puts "#{@player_name} ---> found at offset #{@name_ofs}"  
     puts "*** PERK MAGZS"
     pp @non_crafting_mags
     puts "*** OTHER PERKS"
@@ -85,10 +89,8 @@ class SevenDaysPlayer
     pp @crafting_skills
     puts "*** BASE ATTRIBUTES"
     pp @attributes
-    puts "*** FOUND SOME HASHES"
-    pp @hashes
     puts "*** ALL ELSE?"
-    puts @odd_shits
+    puts @shits_before_name
     puts "\n"
   end
 end
