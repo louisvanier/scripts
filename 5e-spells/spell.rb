@@ -1,7 +1,8 @@
 class Spell
   attr_accessor :name, :level, :casting_time, :range, :components,
                 :duration, :source, :description, :url, :school,
-                :entries_higher_level, :caster_level, :ritual
+                :entries_higher_level, :caster_level, :ritual,
+                :damage_types, :saving_throws
 
   def initialize(attrs = {})
     attrs.each { |k, v| send("#{k}=", v) }
@@ -49,7 +50,7 @@ class Spell
   end
 
   def duration_to_s
-    return duration[0]["type"] if %w(instant special).include?(duration[0]["type"])
+    return duration[0]["type"] if %w(instant special permanent).include?(duration[0]["type"])
     dur = "#{duration[0]["duration"]["amount"]} #{duration[0]["duration"]["type"]}"    
     dur += " (Concentration)" if requires_concentration?
     return dur
@@ -79,6 +80,10 @@ class Spell
     end
     
     lines.join("\n")
+  end
+
+  def to_summary
+    "#{self.name} (#{self.school_name} #{self.level_to_s})#{self.scales_at_higher_level? ? " *" : "" }"
   end
 
   def to_h

@@ -10,12 +10,20 @@ class Scraper
   BASE_URL = "https://5e.tools/data/spells"
   LOCAL_DIR = "data"
   SPELLS_DATA_PREFIX = "spells-"
-
-  attr_reader :referenced_rules
+  CLASSES_PREFIX = "class-"
 
   def initialize()
     @spell_sources = {}
+    @character_classes = {}
     FileUtils.mkdir_p(LOCAL_DIR)
+  end
+
+  def get_spell_lists
+    if !defined?(@spell_lists)
+        @spell_lists = load_or_download(File.join(LOCAL_DIR, "#{SPELLS_DATA_PREFIX}lists.json"), "")
+    end
+
+    @spell_lists
   end
 
   def get_spell_source(source)
@@ -26,8 +34,12 @@ class Scraper
     @spell_sources[source]
   end
 
-  def load_spell
-    Spell.new(parse_spell(s))
+  def get_character_class(cls)
+    if !@character_classes.key?(cls)
+        pp cls
+        @character_classes[cls] = SpellSource.new(load_or_download(File.join(LOCAL_DIR, "#{CLASSES_PREFIX}#{cls}.json"), cls), cls)
+    end
+    @character_classes[cls]
   end
 
   private
@@ -61,13 +73,34 @@ class Scraper
 end
 
 provider = Scraper.new
+# spells_sans_croc = ['Creation','Absorb Elements','Alter Self','Blindness/Deafness','Chill Touch','Color Spray','Dispel Magic','Enhance Ability','Hypnotic Pattern','Invisibility','Lesser Restoration', 'Mage Hand', 'Mending', 'Message', 'Phantom Steed', 'Prestidigitation', 'Ray of Sickness', 'Sacred Flame', 'Shape Water', 'Shield', 'Silent Image', 'Tasha’s Caustic Brew', 'Vampiric Touch', 'Vortex Warp', 'Dimension Door']
+# spellbook = Spellbook.new(provider, {sorcerer: 7}, spells_sans_croc, ['xphb'])
+# spells = spellbook.spells.sort { |a, b| a.level <=> b.level }
+
+# spells.each do |spell|
+#   puts spell
+#   puts "-" * 40
+# end
+sources = ['xphb', 'xge', 'tce']
+
 spells_sans_croc = ['Creation','Absorb Elements','Alter Self','Blindness/Deafness','Chill Touch','Color Spray','Dispel Magic','Enhance Ability','Hypnotic Pattern','Invisibility','Lesser Restoration', 'Mage Hand', 'Mending', 'Message', 'Phantom Steed', 'Prestidigitation', 'Ray of Sickness', 'Sacred Flame', 'Shape Water', 'Shield', 'Silent Image', 'Tasha’s Caustic Brew', 'Vampiric Touch', 'Vortex Warp', 'Dimension Door']
-spellbook = Spellbook.new(provider, {sorcerer: 7}, spells_sans_croc, ['xphb'])
-spells = spellbook.spells.sort { |a, b| a.level <=> b.level }
+# book = Spellbook.new(provider, {sorcerer: 7}, [1], spells_sans_croc, sources)
+# book = Spellbook.for_class_list(provider, 'Cleric', 'Lore', 17, [0,7,8,9], sources)
+book = Spellbook.for_paladin(provider: provider, subclass: "light", sources: sources, levels: [0], caster_level: 17)
+
+spells = book.spells.sort { |a, b| a.level <=> b.level }
 
 spells.each do |spell|
   puts spell
   puts "-" * 40
 end
 
-pp spellbook.referenced_rules
+pp book.conditions_and_variants
+pp book.damage_types
+pp book.saves
+
+pp "bonus action spells -------------"
+book.bonus_actions.each { |s| puts s.to_summary }
+
+pp "reaction spells -------------"
+book.reactions.each { |s| puts s.to_summary }

@@ -4,9 +4,11 @@ class SpellSource
         @sourcename = sourcename
     end
 
-    def load_spells(spell_selection, caster_levels)
+    def load_spells(spell_selection, caster_levels, levels)
         @data["spell"].map do |s|
-            yield Spell.new(parse_spell(s).merge(caster_level: caster_levels.fetch(:sorcerer, 1))) if !spell_selection || spell_selection.include?(normalize_spell_name(s["name"])) 
+            next unless spell_selection.nil? || spell_selection.include?(normalize_spell_name(s["name"]))
+            next unless levels.nil? || levels.include?(s["level"])
+            yield Spell.new(parse_spell(s).merge(caster_level: caster_levels.fetch(:sorcerer, 1)))
         end
     end
 
@@ -28,7 +30,9 @@ class SpellSource
       description: flatten_entries(data["entries"]),
       school: data["school"],
       entries_higher_level: data["entriesHigherLevel"],
-      ritual: data["meta"] && data["meta"]["ritual"]
+      ritual: data["meta"] && data["meta"]["ritual"],
+      damage_types: data["damageInflict"],
+      saving_throws: data["savingThrow"]
     }
   end
 
