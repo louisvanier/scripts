@@ -86,21 +86,13 @@ sources = ['xphb', 'xge', 'tce']
 spells_sans_croc = ['Creation','Absorb Elements','Alter Self','Blindness/Deafness','Chill Touch','Color Spray','Dispel Magic','Enhance Ability','Hypnotic Pattern','Invisibility','Lesser Restoration', 'Mage Hand', 'Mending', 'Message', 'Phantom Steed', 'Prestidigitation', 'Ray of Sickness', 'Sacred Flame', 'Shape Water', 'Shield', 'Silent Image', 'Tasha’s Caustic Brew', 'Vampiric Touch', 'Vortex Warp', 'Dimension Door']
 # book = Spellbook.new(provider, {sorcerer: 7}, [1], spells_sans_croc, sources)
 # book = Spellbook.for_class_list(provider, 'Cleric', 'Lore', 17, [0,7,8,9], sources)
-book = Spellbook.for_paladin(provider: provider, subclass: "light", sources: sources, levels: [0], caster_level: 17)
+book = Spellbook.for_paladin(provider: provider, subclass: "light", sources: sources, levels: [0,1,2,3,4,5], caster_level: 17)
 
-spells = book.spells.sort { |a, b| a.level <=> b.level }
-
-spells.each do |spell|
+book.spells.each do |spell|
   puts spell
   puts "-" * 40
 end
 
-pp book.conditions_and_variants
-pp book.damage_types
-pp book.saves
+book.print_spellbook_stats
 
-pp "bonus action spells -------------"
-book.bonus_actions.each { |s| puts s.to_summary }
 
-pp "reaction spells -------------"
-book.reactions.each { |s| puts s.to_summary }

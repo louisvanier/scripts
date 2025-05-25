@@ -43,8 +43,22 @@ class Spellbook
                 scan_for_rules(spell)
             end
         end
+        @spells.sort! { |a, b| a.level <=> b.level }
     end
     @spells
+  end
+
+  def print_spellbook_stats
+    pp "condition and other rules -------------"
+    pp conditions_and_variants
+    pp "damage types -------------"
+    pp damage_types
+    pp "saves targeted -------------"
+    pp saves
+    pp "bonus action spells -------------"
+    bonus_actions.each { |s| puts s.to_summary }
+    pp "reaction spells -------------"
+    reactions.each { |s| puts s.to_summary }
   end
 
   def bonus_actions
@@ -66,17 +80,17 @@ class Spellbook
         data = r.split("|")[0].split(' ')[1..-1].join(' ')
         conditions_and_variants[type] ||= {}
         conditions_and_variants[type][data] ||= []
-        conditions_and_variants[type][data] << spell.name
+        conditions_and_variants[type][data] << spell.to_summary
     end
 
     spell.damage_types&.each do |dmg|
         damage_types[dmg] ||= []
-        damage_types[dmg] << spell.name
+        damage_types[dmg] << spell.to_summary
     end
 
     spell.saving_throws&.each do |save|
         saves[save] ||= []
-        saves[save] << spell.name
+        saves[save] << spell.to_summary
     end
   end
 end
