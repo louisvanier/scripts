@@ -5,33 +5,65 @@ class SpellList
         CharacterClass::CLASSES.each do |cls|
             define_method("list_for_#{cls}".to_sym) do |**arg|
                 pp "list_for_#{cls} #{arg}"
-                return SpellList.new(arg[:provider], cls, nil, arg[:sources])
+                return SpellList.new(arg[:provider], cls, arg[:subclass], arg[:sources])
             end
         end
     end
 
     def initialize(data_provider, cls, subclass, sources)
         @data_provider = data_provider
-        @class = cls
+        @klass = cls.downcase
         @subclass = subclass
-        @sources = sources
+        @sources = sources.map(&:upcase)
+    end
+
+    def subclass_additional_spells
+        # possibly check for 
+        # @sources.map do |source|
+        #     source_spells = @data_provider.get_spell_lists[source.downcase]&.filter do |_, details|
+        #         spell_matches_subclass(details["subclass"])
+        #     end&.map { |spell, _| spell }
+        #     source_spells&.compact
+        # end.flatten.compact
     end
 
     def get_spell_list
-        sources.map do |source|
-            data_provider.get_spell_lists[source].filter do |_, details|
-                spell_matches_class(details) || spell_matches_subclass(details)
-            end.map { |spell, _| spell }
-        end.flatten
+        @sources.map do |source|
+            source_spells = @data_provider.get_spell_lists[source.downcase]&.filter do |_, details|
+                spell_matches_class(details["class"]) || spell_matches_subclass(details["subclass"])
+            end&.map { |spell, _| spell }
+            source_spells&.compact
+        end.flatten.compact
     end
 
     private
 
-    def spell_matches_class(raw_spell_data)
-        !details["class"].nil? && details["class"].any? { |s, classes| classes.keys.include?(character_class) } 
+    def spell_matches_class(class_data)
+        return false if class_data.nil?
+        @sources.each do |source|
+            next unless class_data.key?(source)
+            return class_data[source].keys.map(&:downcase).include?(@klass)
+        end
+        return false
     end
 
-    def spell_matches_subclass(raw_spell_data)
-        !subclass.nil? && !details["subclass"].nil? && details["subclass"].any? { |s, subclasses| sources.include?(s); pp details["subclass"][s]}
+    def spell_matches_subclass(data)
+        return false if data.nil?
+        @sources.each do |source|
+            next unless data.keys.include?(source)
+
+            case data[source]
+                in Hash => classes
+                classes.each do |class_name, subsource_hash|
+                    subsource_hash.each do |subsource, subclasses|
+                        case subclasses
+                        in Hash => sub_map
+                            return true if sub_map.key?(@subclass)
+                        end
+                    end
+                end
+            end
+        end
+        false 
     end
 end

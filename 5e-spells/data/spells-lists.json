@@ -22714,6 +22714,11 @@
                             "Divine Soul": {
                                 "name": "Divine Soul"
                             }
+                        },
+                        "XPHB": {
+                            "Lunar": {
+                                "name": "Lunar Sorcery"
+                            }
                         }
                     }
                 },
@@ -62491,6 +62496,11 @@
                         "XGE": {
                             "Divine Soul": {
                                 "name": "Divine Soul"
+                            }
+                        },
+                        "DSotDQ": {
+                            "Lunar": {
+                                "name": "Lunar Sorcery"
                             }
                         }
                     },

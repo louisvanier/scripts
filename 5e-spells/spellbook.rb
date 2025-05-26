@@ -6,19 +6,19 @@ class Spellbook
   attr_reader :conditions_and_variants, :damage_types, :saves
 
   class << self
-    CharacterClass::CLASSES.each do |cls|
-        define_method("for_#{cls}".to_sym) do |**args|
-            pp "Spellbook.for_#{cls} #{args}"
-            spells = SpellList.send("list_for_#{cls}", provider: args[:provider], sources: args[:sources])
-            return SpellList.new(args[:provider], cls, args[:subclass], args[:sources])
-        end
-    end
+    # CharacterClass::CLASSES.each do |cls|
+    #     define_method("list_for_#{cls}".to_sym) do |**args|
+    #         pp "Spellbook.list_for_#{cls} #{args}"
+    #         spells = SpellList.send("list_for_#{cls}", provider: args[:provider], sources: args[:sources])
+    #         return SpellList.new(args[:provider], cls, args[:subclass], args[:sources])
+    #     end
+    # end
 
     CharacterClass::CLASSES.each do |cls|
         define_method("for_#{cls}".to_sym) do |**args|
             pp "Spellbook.for_#{cls} #{args}"
-            spells = SpellList.send("list_for_#{cls}", provider: args[:provider], sources: args[:sources])
-            return Spellbook.new(args[:provider], { cls.to_sym => args[:caster_level] }, args[:levels], args[:spells], args[:sources])
+            spells = SpellList.send("list_for_#{cls}", provider: args[:provider], sources: args[:sources], subclass: args[:subclass]).get_spell_list
+            return Spellbook.new(args[:provider], { cls.to_sym => args[:caster_level] }, args[:levels], spells, args[:sources])
         end
     end
   end
@@ -38,11 +38,11 @@ class Spellbook
     if !defined?(@spells)
         @spells = []
         @spell_sources.map do |source|
-            @data_provider.get_spell_source(source).load_spells(@spell_selection, @caster_levels, @spell_levels) do |spell|
+            @data_provider.get_spell_source(source)&.load_spells(@spell_selection, @caster_levels, @spell_levels) do |spell|
                 @spells << spell
                 scan_for_rules(spell)
             end
-        end
+        end.compact
         @spells.sort! { |a, b| a.level <=> b.level }
     end
     @spells
