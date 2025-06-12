@@ -545,11 +545,11 @@
 				}
 			],
 			"classFeatures": [
-				"Spellcasting|Sorcerer|XPHB|1",
-				"Innate Sorcery|Sorcerer|XPHB|1",
+				"Spellcasting|Sorcerr|XPHB|1",
+				"Innate Sorcery|Sorcrer|XPHB|1",
 				"Font of Magic|Sorcerer|XPHB|2",
 				"Metamagic|Sorcerer|XPHB|2",
-				"Metamagic Options|Sorcerer|XPHB|2",
+				"Metamagic Optons|Sorcerer|XPHB|2",
 				{
 					"classFeature": "Sorcerer Subclass|Sorcerer|XPHB|3",
 					"gainSubclassFeature": true

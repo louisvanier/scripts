@@ -36,7 +36,7 @@ class Scraper
 
   def get_character_class(cls)
     if !@character_classes.key?(cls)
-        @character_classes[cls] = SpellSource.new(load_or_download(File.join(LOCAL_DIR, "#{CLASSES_PREFIX}#{cls}.json"), cls), cls)
+        @character_classes[cls] = load_or_download(File.join(LOCAL_DIR, "#{CLASSES_PREFIX}#{cls}.json"), cls)
     end
     @character_classes[cls]
   end
@@ -79,11 +79,22 @@ spells_sans_croc = ['Creation','Absorb Elements','Alter Self','Blindness/Deafnes
 # book = Spellbook.for_class_list(provider, 'Cleric', 'Lore', 17, [0,7,8,9], sources)
 book = Spellbook.for_sorcerer(provider: provider, subclass: "Lunar", sources: sources, levels: [1,2], caster_level: 17)
 
-book.spells.each do |spell|
-  puts spell.to_summary
+# book.spells.each do |spell|
+#   puts spell.to_summary
+#   puts "-" * 40
+# end
+
+# book.print_spellbook_stats
+
+
+# klass = CharacterClass.bard(provider: provider)
+# klass = CharacterClass.cleric(provider: provider)
+# klass = CharacterClass.sorcerer(provider: provider)
+klass = CharacterClass.cleric(provider: provider)
+klass.all_features(1..7, "trickery domain").each do |f|
+  # puts "#{f.name} - #{f.level}"
+  puts f
   puts "-" * 40
 end
-
-book.print_spellbook_stats
 
 
