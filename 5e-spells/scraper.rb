@@ -1,13 +1,5 @@
-require 'httparty'
-require 'json'
-require 'fileutils'
-require 'logger'
 
-require './spell.rb'
-require './spellbook.rb'
-require './spell_source.rb'
-require './character_sheet.rb'
-require './class_levels.rb'
+
 
 class Scraper
   BASE_URL = "https://5e.tools/data/spells"
@@ -17,7 +9,14 @@ class Scraper
   KNOWN_NO_SPELLS_SOURCES = ['dsotdq']
 
   class << self
-    # TODO MOVE TO USING AN ACTUAL LOGGER
+    def instance
+      if !defined?(@instance)
+        @instance = Scraper.new
+      end
+
+      return @instance
+    end
+
     def log_level
       Logger::WARN
     end
@@ -88,31 +87,3 @@ class Scraper
     }
   end
 end
-
-provider = Scraper.new
-sources = ['xphb', 'xge', 'tce', 'dsotdq']
-spells_sans_croc = ['Creation','Absorb Elements','Alter Self','Blindness/Deafness','Chill Touch','Color Spray','Dispel Magic','Enhance Ability','Hypnotic Pattern','Invisibility','Lesser Restoration', 'Mage Hand', 'Mending', 'Message', 'Phantom Steed', 'Prestidigitation', 'Ray of Sickness', 'Sacred Flame', 'Shape Water', 'Shield', 'Silent Image', 'Tasha’s Caustic Brew', 'Vampiric Touch', 'Vortex Warp', 'Dimension Door']
-
-# book.spells.each do |spell|
-#   puts spell.to_summary
-#   puts "-" * 40
-# end
-
-
-players = []
-players << CharacterSheet.new(char_name: 'Sans-croc', player_name: 'Louis V.', klass_levels: [ClassLevels.new(character_class: 'sorcerer', level: 7, choices: { subclass: 'lunar sorcery'}, source: "XPHB")], source: "XPHB",  str: 8, dex: 17, con: 14, int: 10, wis: 10, cha: 18, provider: provider, learned_spells: spells_sans_croc)
-players << CharacterSheet.new(char_name: 'Florianz', player_name: 'Francis M.', klass_levels: [ClassLevels.new(character_class: 'cleric', level: 7, choices: { subclass: 'trickery domain'}, source: "XPHB")], source: "XPHB", str: 8, dex: 17, con: 14, int: 10, wis: 10, cha: 18, provider: provider, learned_spells: [])
-players << CharacterSheet.new(char_name: 'Alfonso', player_name: 'Olivier P.', klass_levels: [ClassLevels.new(character_class: 'artificer', level: 7, choices: { subclass: 'battle smith'}, source: "TCE")], source: "XPHB", str: 8, dex: 17, con: 14, int: 10, wis: 10, cha: 18, provider: provider, learned_spells: [])
-players << CharacterSheet.new(char_name: 'Guillemain', player_name: 'Maxime T.', klass_levels: [ClassLevels.new(character_class: 'rogue', level: 7, choices: { subclass: 'assassin'}, source: "XPHB")], source: "XPHB", str: 8, dex: 17, con: 14, int: 10, wis: 10, cha: 18, provider: provider, learned_spells: [])
-players << CharacterSheet.new(char_name: 'Clovis', player_name: 'David R.', klass_levels: [ClassLevels.new(character_class: 'ranger', level: 7, choices: { subclass: 'gloom stalker'}, source: "XPHB")], source: "XPHB", str: 8, dex: 17, con: 14, int: 10, wis: 10, cha: 18, provider: provider, learned_spells: [])
-players << CharacterSheet.new(char_name: 'Tobiash', player_name: 'Alex G.', klass_levels: [ClassLevels.new(character_class: 'barbarian', level: 7, choices: { subclass: 'path of the world tree'}, source: "XPHB")], source: "XPHB", str: 8, dex: 17, con: 14, int: 10, wis: 10, cha: 18, provider: provider, learned_spells: [])
-players << CharacterSheet.new(char_name: 'Taureau Ecarlate', player_name: 'David B.', klass_levels: [ClassLevels.new(character_class: 'monk', level: 7, choices: { subclass: 'way of shadow'}, source: "XPHB")], source: "XPHB", str: 8, dex: 17, con: 14, int: 10, wis: 10, cha: 18, provider: provider, learned_spells: [])
-players << CharacterSheet.new(char_name: 'Godefroy', player_name: 'Julien G.', klass_levels: [ClassLevels.new(character_class: 'paladin', level: 7, choices: { subclass: 'oath of glory'}, source: "XPHB")], source: "XPHB", str: 8, dex: 17, con: 14, int: 10, wis: 10, cha: 18, provider: provider, learned_spells: [])
-writer = ConsoleWriter.new
-players.each do |player|
-  writer.write("<#{"-" * 78}>")
-  writer.open_nesting
-  player.print_summary(writer)
-  writer.close_nesting
-end
-

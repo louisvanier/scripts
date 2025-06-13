@@ -4,11 +4,11 @@ require 'taglib'
 require 'yaml'
 require 'logger'
 require 'optparse'
-
+# global params that for now are not options
 rename_songs = true
 SAVE_TAGS = false
 METADATA_FILE_NAME = 'metadata.yml'
-
+# actual command line options
 params = {
   :write => false,
   :filter => '[Aa]*',

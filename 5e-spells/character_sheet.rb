@@ -1,5 +1,3 @@
-require './console_writer.rb'
-
 class CharacterSheet
     ALLOWED_SPELL_SOURCES = ['xphb', 'xge', 'tce', 'dsotdq']
 
@@ -16,7 +14,6 @@ class CharacterSheet
         @int = args[:int]
         @wis = args[:wis]
         @cha = args[:cha]
-        @data_provider = args[:provider]
         @source = args[:source]
         @learned_spells = args[:learned_spells]
     end
@@ -25,9 +22,8 @@ class CharacterSheet
         if !defined?(@spellbooks) || refresh
             @spellbooks = {}
             @klass_levels.each do |kl|
-                #sources should be made dynamic
-                max_spell_level = (kl.level/2.0).ceil #TODO => can this be read from the tables instead?
-                @spellbooks[kl.character_class] = Spellbook.send("for_#{kl.character_class}", provider: @data_provider, subclass: kl.subclass, sources: ALLOWED_SPELL_SOURCES, levels: (1..(max_spell_level)).to_a, caster_level: kl.level)
+                #sources should be made dynamic with the constant as a default value
+                @spellbooks[kl.character_class] = Spellbook.send("for_#{kl.klass_name}", subclass: kl.subclass.short_name, sources: ALLOWED_SPELL_SOURCES, levels: (1..(kl.max_spell_level)).to_a, caster_level: kl.level)
             end
         end
         @spellbooks
@@ -40,7 +36,7 @@ class CharacterSheet
     def klass_abilities(refresh = false)
         if !defined?(@klass_abilities) || refresh
             @klass_abilities = @klass_levels.map do |klass|
-                [klass.character_class, CharacterClass.send(klass.character_class, provider: @data_provider, source: klass.source || "XPHB").all_features(1..klass.level, klass.subclass)]
+                [klass.character_class, kl.abilities]
             end.to_h
         end
         @klass_abilities
@@ -51,7 +47,7 @@ class CharacterSheet
     end
 
     def spellcaster?
-        return abilities.any? { |a| a.name.downcase == "spellcasting"}
+        return @klass_levels.any?(&:has_spellcasting?)
     end
 
     def bonus_actions
@@ -101,9 +97,14 @@ class CharacterSheet
             klass_levels.each do |kl|
                 next unless klass_abilities[kl.character_class].any? { |a| a.name.downcase == "spellcasting"}
                 writer.open_nesting
-                writer.write "--- For #{kl.character_class} --- [#{spellbook(kl.character_class).spellbook_legend}]"
+                writer.write "--- For #{kl.klass_name} --- [#{spellbook(kl.character_class).spellbook_legend}]"
                 writer.open_nesting
-                spellbook(kl.character_class).print_spellbook_stats(writer)
+                # spellbook(kl.character_class).print_spellbook_stats(writer)
+                spellbook(kl.character_class).compact_list.each do |l|
+                    writer.write '^^^^^^^'
+                    writer.write l.to_compact_list
+                    writer.write l.to_compact_list_line_two
+                end
                 writer.close_nesting
                 writer.close_nesting
             end

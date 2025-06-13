@@ -24,7 +24,7 @@ class SpellSource
       level: data["level"],
       casting_time: data["time"]&.map { |t| "#{t['number']} #{t['unit']}" }&.join(', '),
       range: data["range"],
-      components: data["components"].map { |k, v| ['v', 's'].include?(k) ? k.upcase : "#{k.upcase} => #{v}"},
+      components: data["components"].map { |k, v| ['v', 's'].include?(k) ? k.upcase : "#{k.upcase} => #{v["text"] || "a reagent"}"},
       duration: data["duration"],
       source: "#{data['source']}#{' p.' + data['page'].to_s if data['page']}",
       description: flatten_entries(data["entries"]),

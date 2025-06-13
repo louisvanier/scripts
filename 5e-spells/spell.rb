@@ -67,6 +67,10 @@ class Spell
     return "#{distance_str} #{range["type"]}"
   end
 
+  def components_to_s(include_non_consumable = false)
+    components.map { |c| c.start_with?("M => ") && !c.end_with?("a reagent") ? "M => $$$" : c}.compact.join(',')
+  end
+
   def to_s
     lines = [
         "#{self.name} (#{self.school_name} #{self.level_to_s})#{self.scales_at_higher_level? ? " *" : "" }",
@@ -84,6 +88,18 @@ class Spell
 
   def to_summary
     "#{self.name} (#{self.school_name} #{self.level_to_s})#{self.scales_at_higher_level? ? " *" : "" }#{self.requires_concentration? ? " (C)" : ""}"
+  end
+
+  def to_compact_list
+    damage_types = damage_types&.map do |dmg|
+      Spellbook::DAMAGE_TYPES_EMOJI_MAP[dmg] || dmg
+    end&.join(' / ')
+    "#{damage_types}#{self.name} (#{self.school_name} | #{self.level_to_s})#{self.scales_at_higher_level? ? " *" : "" }#{self.requires_concentration? ? " (C)" : ""}"
+  end
+
+  def to_compact_list_line_two
+    
+    "#{components_to_s} | #{range_to_s} | #{duration_to_s}"
   end
 
   def to_short_summary

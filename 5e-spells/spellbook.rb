@@ -1,7 +1,3 @@
-require './spell.rb'
-require './spell_list.rb'
-require './character_class.rb'
-
 class Spellbook
   attr_accessor :conditions_and_variants, :damage_types, :saves
 
@@ -22,22 +18,28 @@ class Spellbook
       }
 
   class << self
-    CharacterClass::CLASSES.each do |cls|
+    CharacterKlass::CLASS_LIST.each do |cls, _|
         define_method("for_#{cls}".to_sym) do |**args|
-            spells = SpellList.send("list_for_#{cls}", provider: args[:provider], sources: args[:sources], subclass: args[:subclass]).get_spell_list
-            return Spellbook.new(args[:provider], { cls.to_sym => args[:caster_level] }, args[:levels], spells, args[:sources])
+            book_type = CharacterKlass.send(cls).spellbook_type
+            case book_type
+            when :known_is_entire_list
+                spells = SpellList.send("list_for_#{args[:klass_level].klass_name}", sources: args[:sources] || ["XPHB"], subclass: args[:klass_level].subclass.short_name).get_spell_list
+                return Spellbook.new({ args[:klass_level].klass_name.to_sym => args[:klass_level].level }, (1..(args[:klass_level].max_spell_level)).to_a, spells, args[:sources])
+            else 
+                return Spellbook.new({ args[:klass_level].klass_name.to_sym => args[:klass_level].level }, (1..(args[:klass_level].max_spell_level)).to_a, args[:known_spells], args[:sources])
+            end
+            
         end
     end
   end
 
-  def initialize(data_provider, class_levels = { sorcerer: 1, wizard: 1, cleric: 1, paladin: 1, ranger: 1, bard: 1 }, levels = nil, spell_selection = nil, sources = ['xphb'])
+  def initialize(class_levels = { sorcerer: 1, wizard: 1, cleric: 1, paladin: 1, ranger: 1, bard: 1 }, levels = nil, spell_selection = nil, sources = ['xphb'])
     @spell_selection = spell_selection&.map { |name| normalize(name) }
     @class_levels = class_levels
     @conditions_and_variants = {}
     @damage_types = Hash.new { |h, k| h[k] = [] } 
     @saves = Hash.new { |h, k| h[k] = [] } 
     @spell_sources = sources
-    @data_provider = data_provider
     @spell_levels = levels
   end
 
@@ -45,7 +47,7 @@ class Spellbook
     if !defined?(@spells) || refresh
         @spells = []
         @spell_sources.map do |source|
-            @data_provider.get_spell_source(source)&.load_spells(@spell_selection, @class_levels, @spell_levels) do |spell|
+            Scraper.instance.get_spell_source(source)&.load_spells(@spell_selection, @class_levels, @spell_levels) do |spell|
                 @spells << spell
                 scan_for_rules(spell)
             end
@@ -54,6 +56,16 @@ class Spellbook
         @spells.sort! { |a, b| a.level <=> b.level }
     end
     @spells
+  end
+
+  def compact_list
+    spells.sort do |a, b|
+      if a.school == b.school
+        a <=> b
+      else
+        a.school <=> b.school
+      end
+    end
   end
 
   def spellbook_legend
@@ -106,7 +118,7 @@ class Spellbook
   end
 
   def print_summary_saves(writer = ConsoleWriter.new)
-    reverse_emoji_lookup = CharacterClass::ATTRIBUTES_EMOJI_MAP.invert
+    reverse_emoji_lookup = CharacterKlass::ATTRIBUTES_EMOJI_MAP.invert
     legend = saves.map { |t, s| t.split(' ') }.flatten.uniq.sort.map { |t| reverse_emoji_lookup[t].nil? ? t : "#{t} => #{reverse_emoji_lookup[t]}" }.join(', ')
     writer.write "--- Saves targeted --- [#{legend}]"
     saves.each do |type, spells|
@@ -145,7 +157,7 @@ class Spellbook
     end
 
     spell.saving_throws&.each do |save|
-      mapped_type = CharacterClass::ATTRIBUTES_EMOJI_MAP[save]
+      mapped_type = CharacterKlass::ATTRIBUTES_EMOJI_MAP[save]
       @saves[mapped_type] << spell
     end
   end
@@ -165,8 +177,6 @@ class Spellbook
       end
     end
   end
-
-  
 end
 
 

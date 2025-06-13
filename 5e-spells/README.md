@@ -12,3 +12,7 @@ It should be able to also print a text only version of the spellbook that can th
 * detect max level of spells to get for a character sheet based on the actual class table rather than the old hard formula
 * lookup conditions in the condition list to have a printable cheat sheet
 * maybe do the same thing with equipement at some point
+* move some queries to the party level (right now scraper uses a dumb array of characterSheets)
+
+# Random notes
+The usage of `Klass` in names instead of `Class` is because we live in an object oriented world and `Class` is a keyword and I want to be unambiguous

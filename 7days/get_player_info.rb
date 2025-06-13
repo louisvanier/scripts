@@ -16,7 +16,7 @@ NON_CRAFTING_MAGAZINES = %w(firemansalmanac nightstalker luckylooter enforcer ba
 ATTRIBUTES = %w(perception strength fortitude agility intellect)
 
 class SevenDaysPlayer
-  attr_reader :player_name, :crafting_skills, :perks
+  attr_reader :player_name, :crafting_skills, :perks, :odd_shits
 
   def initialize(save_file_path)
     @save_file_path = save_file_path
@@ -42,12 +42,12 @@ class SevenDaysPlayer
       c = @reader.get(1)
       if c.ord == 123 # {
         @hashes << @reader.get_hash
-      else 
+      elsif !str.nil?
         str = c + @reader.get_str
         if str =~ /crafting/
           # HMMM, is our last character outside of a-z?
           if str[-1].ord < 97 || str[-1].ord > 122
-            skill_level = @reader.get(1, @reader.ofs - 2).ord          
+            skill_level = @reader.get(1, @reader.ofs - 2).ord
             @crafting_skills[str[0..-2].gsub(/crafting/, '')] = skill_level if skill_level > 1
           else
             skill_level = @reader.get(1, @reader.ofs - 1).ord
@@ -70,7 +70,8 @@ class SevenDaysPlayer
         elsif str =~ /skill/ && !(attri  = ATTRIBUTES.find { |att| str =~ /#{att}/ }).nil?
           @attributes[attri] ||= {}
           @attributes[attri][str.gsub('skill', '').gsub(/#{attri}/, "")] = @reader.get(1, @reader.ofs - 1).ord
-        else
+        elsif str !~ /(craft|place|gather|harvest|skill|buff)/
+
           maybe = @reader.get(1, @reader.ofs - 1).ord unless @reader.eof?
           @odd_shits[str] = maybe unless maybe.nil? || maybe == 0
         end
@@ -80,7 +81,7 @@ class SevenDaysPlayer
 
   def show_stuff
     puts "\n"
-    puts "#{@player_name} ---> found at offset #{@name_ofs}"  
+    puts "#{@player_name} ---> found at offset #{@name_ofs}"
     puts "*** PERK MAGZS"
     pp @non_crafting_mags
     puts "*** OTHER PERKS"
@@ -89,8 +90,8 @@ class SevenDaysPlayer
     pp @crafting_skills
     puts "*** BASE ATTRIBUTES"
     pp @attributes
-    puts "*** ALL ELSE?"
-    puts @shits_before_name
+    #puts "*** ALL ELSE?"
+    #pp @odd_shits.keys
     puts "\n"
   end
 end
@@ -155,10 +156,13 @@ class BinaryFileReader
 end
 
 @logger ||= Logger.new(STDOUT)
+players = []
 Dir.glob(File.join(params[:'player-save-files-path'], '*.ttp')).each do |player|
   @logger.debug("reading #{player}")
   player = SevenDaysPlayer.new(player)
   player.parse_save_file
   player.show_stuff
-
+  players << player
 end
+
+pp players.map {|p| p.odd_shits.keys }.inject(:&)
