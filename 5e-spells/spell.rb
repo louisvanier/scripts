@@ -2,7 +2,7 @@ class Spell
   attr_accessor :name, :level, :casting_time, :range, :components,
                 :duration, :source, :description, :url, :school,
                 :entries_higher_level, :caster_level, :ritual,
-                :damage_types, :saving_throws
+                :damage_types, :saving_throws, :damage_inflict
 
   def initialize(attrs = {})
     attrs.each { |k, v| send("#{k}=", v) }
@@ -83,7 +83,11 @@ class Spell
   end
 
   def to_summary
-    "#{self.name} (#{self.school_name} #{self.level_to_s})#{self.scales_at_higher_level? ? " *" : "" }"
+    "#{self.name} (#{self.school_name} #{self.level_to_s})#{self.scales_at_higher_level? ? " *" : "" }#{self.requires_concentration? ? " (C)" : ""}"
+  end
+
+  def to_short_summary
+    "#{self.name} (lvl #{self.level_to_s})#{self.scales_at_higher_level? ? " *" : "" }#{self.requires_concentration? ? " (C)" : ""}"
   end
 
   def to_h
@@ -99,5 +103,12 @@ class Spell
       url: url,
       school: school
     }
+  end
+
+  def <=>(other)
+    if other.level == self.level
+      return self.name <=> other.name
+    end
+    return self.level <=> other.level
   end
 end

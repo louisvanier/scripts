@@ -4,7 +4,6 @@ class SpellList
     class << self
         CharacterClass::CLASSES.each do |cls|
             define_method("list_for_#{cls}".to_sym) do |**arg|
-                pp "list_for_#{cls} #{arg}"
                 return SpellList.new(arg[:provider], cls, arg[:subclass], arg[:sources])
             end
         end

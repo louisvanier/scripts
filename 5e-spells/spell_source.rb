@@ -32,7 +32,7 @@ class SpellSource
       entries_higher_level: data["entriesHigherLevel"],
       ritual: data["meta"] && data["meta"]["ritual"],
       damage_types: data["damageInflict"],
-      saving_throws: data["savingThrow"]
+      saving_throws: data["savingThrow"],
     }
   end
 
