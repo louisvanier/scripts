@@ -56,49 +56,64 @@ class Spellbook
     @spells
   end
 
-  def print_spellbook_legent
+  def spellbook_legend
+    legend = []
     if spells.any?(&:scales_at_higher_level?)
-      pp "* => Scales at higher level"
+      legend << "* => Scales at higher level"
     end
 
     if spells.any?(&:requires_concentration?)
-      pp  "(C) => Requires Concentration"
+      legend <<  "(C) => Requires Concentration"
     end
+
+    legend.join(', ')
   end
 
-  def print_spellbook_stats
-    pp "condition and other rules -------------"
+  def print_spellbook_stats(writer = ConsoleWriter.new)
+    writer.write "--- condition and other rules ---"
     conditions_and_variants.each do |type, data|
-      pp "  #{type}"
+      writer.open_nesting
+      writer.write "#{type}"
+      writer.open_nesting
       data.each do |data_val, spells|
-        pp "    #{data_val} : #{spells.sort.map(&:to_short_summary).join(', ')}"
+        writer.write "#{data_val} : #{spells.sort.map(&:to_short_summary).join(', ')}"
       end
+      writer.close_nesting
+      writer.close_nesting
     end
-    print_summary_damage_types
-    print_summary_saves
-    pp "bonus action spells -------------"
-    bonus_actions.each { |s| puts s.to_short_summary }
-    pp "reaction spells -------------"
-    reactions.each { |s| puts s.to_short_summary }
+    print_summary_damage_types(writer)
+    print_summary_saves(writer)
+    writer.write "--- bonus action spells, total #{bonus_actions.size} ---"
+    writer.open_nesting
+    writer.write bonus_actions.map(&:to_short_summary).join(', ')
+    writer.close_nesting
+    writer.write "--- reaction spells, total #{reactions.size} ---"
+    writer.open_nesting
+    writer.write reactions.map(&:to_short_summary).join(', ')
+    writer.close_nesting
   end
 
-  def print_summary_damage_types
+  def print_summary_damage_types(writer = ConsoleWriter.new)
     reverse_emoji_lookup = Spellbook::DAMAGE_TYPES_EMOJI_MAP.invert
-    legend = damage_types.map { |t, s| t.split(' / ') }.flatten.uniq.sort.map { |t| reverse_emoji_lookup[t].nil? ? t : "#{t} = #{reverse_emoji_lookup[t]}" }.join(', ')
-    pp "damage types --- #{legend}"
+    legend = damage_types.map { |t, s| t.split(' / ') }.flatten.uniq.sort.map { |t| reverse_emoji_lookup[t].nil? ? t : "#{t} => #{reverse_emoji_lookup[t]}" }.join(', ')
+    writer.write "--- damage types --- [#{legend}]"
     damage_types.each do |type, spells|
-      pp "  #{type}"
-      pp "    #{spells.sort.map(&:to_short_summary).join(', ')}"
+      writer.open_nesting
+      writer.write "  #{type}"
+      writer.write "    #{spells.sort.map(&:to_short_summary).join(', ')}"
+      writer.close_nesting
     end
   end
 
-  def print_summary_saves
+  def print_summary_saves(writer = ConsoleWriter.new)
     reverse_emoji_lookup = CharacterClass::ATTRIBUTES_EMOJI_MAP.invert
-    legend = saves.map { |t, s| t.split(' ') }.flatten.uniq.sort.map { |t| reverse_emoji_lookup[t].nil? ? t : "#{t} = #{reverse_emoji_lookup[t]}" }.join(', ')
-    pp "Saves targeted --- #{legend}"
+    legend = saves.map { |t, s| t.split(' ') }.flatten.uniq.sort.map { |t| reverse_emoji_lookup[t].nil? ? t : "#{t} => #{reverse_emoji_lookup[t]}" }.join(', ')
+    writer.write "--- Saves targeted --- [#{legend}]"
     saves.each do |type, spells|
-      pp "  #{type}"
-      pp "    #{spells.sort.map(&:to_short_summary).join(', ')}"
+      writer.open_nesting
+      writer.write "  #{type}"
+      writer.write "    #{spells.sort.map(&:to_short_summary).join(', ')}"
+      writer.close_nesting
     end
   end
 

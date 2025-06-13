@@ -108,8 +108,11 @@ players << CharacterSheet.new(char_name: 'Clovis', player_name: 'David R.', klas
 players << CharacterSheet.new(char_name: 'Tobiash', player_name: 'Alex G.', klass_levels: [ClassLevels.new(character_class: 'barbarian', level: 7, choices: { subclass: 'path of the world tree'}, source: "XPHB")], source: "XPHB", str: 8, dex: 17, con: 14, int: 10, wis: 10, cha: 18, provider: provider, learned_spells: [])
 players << CharacterSheet.new(char_name: 'Taureau Ecarlate', player_name: 'David B.', klass_levels: [ClassLevels.new(character_class: 'monk', level: 7, choices: { subclass: 'way of shadow'}, source: "XPHB")], source: "XPHB", str: 8, dex: 17, con: 14, int: 10, wis: 10, cha: 18, provider: provider, learned_spells: [])
 players << CharacterSheet.new(char_name: 'Godefroy', player_name: 'Julien G.', klass_levels: [ClassLevels.new(character_class: 'paladin', level: 7, choices: { subclass: 'oath of glory'}, source: "XPHB")], source: "XPHB", str: 8, dex: 17, con: 14, int: 10, wis: 10, cha: 18, provider: provider, learned_spells: [])
+writer = ConsoleWriter.new
 players.each do |player|
-  puts "-" * 40
-  player.print_summary
+  writer.write("<#{"-" * 78}>")
+  writer.open_nesting
+  player.print_summary(writer)
+  writer.close_nesting
 end
 
