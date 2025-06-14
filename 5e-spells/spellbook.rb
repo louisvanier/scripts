@@ -2,36 +2,20 @@ class Spellbook
   attr_accessor :conditions_and_variants, :damage_types, :saves
 
   DAMAGE_TYPES_EMOJI_MAP = {
-        "lightning" => '⚡',
-        "radiant" => '🔆',
-        "acid" => '🍋‍🟩',
-        "cold" => '❄️',
-        "necrotic" => '☠️',
-        "thunder" => '〰️',
-        "fire" => '🔥',
-        "psychic" => '🤯',
-        'piercing' => '🔪',
-        'slashing' => '🪓',
-        'bludgeoning' => '⚒️',
-        'force' => '🪄',
-        "poison" => '🤢'
-      }
-
-  class << self
-    CharacterKlass::CLASS_LIST.each do |cls, _|
-        define_method("for_#{cls}".to_sym) do |**args|
-            book_type = CharacterKlass.send(cls).spellbook_type
-            case book_type
-            when :known_is_entire_list
-                spells = SpellList.send("list_for_#{args[:klass_level].klass_name}", sources: args[:sources] || ["XPHB"], subclass: args[:klass_level].subclass.short_name).get_spell_list
-                return Spellbook.new({ args[:klass_level].klass_name.to_sym => args[:klass_level].level }, (1..(args[:klass_level].max_spell_level)).to_a, spells, args[:sources])
-            else 
-                return Spellbook.new({ args[:klass_level].klass_name.to_sym => args[:klass_level].level }, (1..(args[:klass_level].max_spell_level)).to_a, args[:known_spells], args[:sources])
-            end
-            
-        end
-    end
-  end
+      "lightning" => '⚡',
+      "radiant" => '🔆',
+      "acid" => '🍋‍🟩',
+      "cold" => '❄️',
+      "necrotic" => '☠️',
+      "thunder" => '〰️',
+      "fire" => '🔥',
+      "psychic" => '🤯',
+      'piercing' => '🔪',
+      'slashing' => '🪓',
+      'bludgeoning' => '⚒️',
+      'force' => '🪄',
+      "poison" => '🤢'
+    }
 
   def initialize(class_levels = { sorcerer: 1, wizard: 1, cleric: 1, paladin: 1, ranger: 1, bard: 1 }, levels = nil, spell_selection = nil, sources = ['xphb'])
     @spell_selection = spell_selection&.map { |name| normalize(name) }
@@ -84,25 +68,26 @@ class Spellbook
   def print_spellbook_stats(writer = ConsoleWriter.new)
     writer.write "--- condition and other rules ---"
     conditions_and_variants.each do |type, data|
-      writer.open_nesting
-      writer.write "#{type}"
-      writer.open_nesting
-      data.each do |data_val, spells|
-        writer.write "#{data_val} : #{spells.sort.map(&:to_short_summary).join(', ')}"
+      writer.with_nesting do
+        writer.write "#{type}"
+        writer.with_nesting do
+          data.each do |data_val, spells|
+            writer.write "#{data_val} : #{spells.sort.map(&:to_short_summary).join(', ')}"
+          end
+        end
       end
-      writer.close_nesting
-      writer.close_nesting
+      
     end
     print_summary_damage_types(writer)
     print_summary_saves(writer)
     writer.write "--- bonus action spells, total #{bonus_actions.size} ---"
-    writer.open_nesting
-    writer.write bonus_actions.map(&:to_short_summary).join(', ')
-    writer.close_nesting
+    writer.with_nesting do
+      writer.write bonus_actions.map(&:to_short_summary).join(', ')
+    end
     writer.write "--- reaction spells, total #{reactions.size} ---"
-    writer.open_nesting
-    writer.write reactions.map(&:to_short_summary).join(', ')
-    writer.close_nesting
+    writer.with_nesting do
+      writer.write reactions.map(&:to_short_summary).join(', ')
+    end
   end
 
   def print_summary_damage_types(writer = ConsoleWriter.new)
@@ -110,10 +95,10 @@ class Spellbook
     legend = damage_types.map { |t, s| t.split(' / ') }.flatten.uniq.sort.map { |t| reverse_emoji_lookup[t].nil? ? t : "#{t} => #{reverse_emoji_lookup[t]}" }.join(', ')
     writer.write "--- damage types --- [#{legend}]"
     damage_types.each do |type, spells|
-      writer.open_nesting
-      writer.write "  #{type}"
-      writer.write "    #{spells.sort.map(&:to_short_summary).join(', ')}"
-      writer.close_nesting
+      writer.with_nesting do
+        writer.write "  #{type}"
+        writer.write "    #{spells.sort.map(&:to_short_summary).join(', ')}"
+      end
     end
   end
 
@@ -122,10 +107,10 @@ class Spellbook
     legend = saves.map { |t, s| t.split(' ') }.flatten.uniq.sort.map { |t| reverse_emoji_lookup[t].nil? ? t : "#{t} => #{reverse_emoji_lookup[t]}" }.join(', ')
     writer.write "--- Saves targeted --- [#{legend}]"
     saves.each do |type, spells|
-      writer.open_nesting
-      writer.write "  #{type}"
-      writer.write "    #{spells.sort.map(&:to_short_summary).join(', ')}"
-      writer.close_nesting
+      writer.with_nesting do
+        writer.write "  #{type}"
+        writer.write "    #{spells.sort.map(&:to_short_summary).join(', ')}"
+      end
     end
   end
 

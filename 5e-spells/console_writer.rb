@@ -8,6 +8,12 @@ class ConsoleWriter
         end
     end
 
+    def with_nesting
+        open_nesting
+        yield
+        close_nesting
+    end
+
     def write(msg)
         if msg.is_a?(String)
             nest_message(msg)

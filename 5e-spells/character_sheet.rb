@@ -1,7 +1,7 @@
 class CharacterSheet
     ALLOWED_SPELL_SOURCES = ['xphb', 'xge', 'tce', 'dsotdq']
 
-    attr_accessor :char_name, :player_name, :klass_levels, :str, :dex, :con, :int, :wis, :cha, :learned_spells
+    attr_accessor :char_name, :player_name, :klass_levels, :str, :dex, :con, :int, :wis, :cha
 
     #klass levels is an array of ClassLevel representing the source (version) of the class, its level, and any choices made (feats, options, etc)
     def initialize(**args)
@@ -15,7 +15,6 @@ class CharacterSheet
         @wis = args[:wis]
         @cha = args[:cha]
         @source = args[:source]
-        @learned_spells = args[:learned_spells]
     end
 
     def spellbooks(refresh = false)
@@ -23,7 +22,7 @@ class CharacterSheet
             @spellbooks = {}
             @klass_levels.each do |kl|
                 #sources should be made dynamic with the constant as a default value
-                @spellbooks[kl.character_class] = Spellbook.send("for_#{kl.klass_name}", subclass: kl.subclass.short_name, sources: ALLOWED_SPELL_SOURCES, levels: (1..(kl.max_spell_level)).to_a, caster_level: kl.level)
+                @spellbooks[kl.character_class] = kl.spellbook
             end
         end
         @spellbooks
@@ -36,7 +35,7 @@ class CharacterSheet
     def klass_abilities(refresh = false)
         if !defined?(@klass_abilities) || refresh
             @klass_abilities = @klass_levels.map do |klass|
-                [klass.character_class, kl.abilities]
+                [klass.character_class, klass.abilities]
             end.to_h
         end
         @klass_abilities
@@ -59,16 +58,7 @@ class CharacterSheet
     end
 
     def print_summary(writer = ConsoleWriter.new)
-        writer.write "#{char_name} (#{player_name}), #{klass_levels.map{ |kl| kl.to_summary}.join(', ')}"
-        writer.open_nesting
-        writer.write "--- Class Abilities ---"
-        writer.open_nesting
-        writer.write abilities.map(&:name).join(', ')
-        
-        writer.write "--- Bonus Actions & Reactions ---"
-        writer.open_nesting
-        writer.write "  Bonus: #{bonus_actions.map(&:name).join(', ')} | Reaction: #{reactions.map(&:name).join(', ')}"
-        writer.close_nesting
+        #TODO move this to a method call to compile everything
         conditions_and_variants = Hash.new { |hash, type| hash[type] = Hash.new { |nested, data| nested[data] = [] }}
         abilities.each do |ability|
             ability.rules_map.each do |type, data|
@@ -78,38 +68,47 @@ class CharacterSheet
                 end
             end
         end
-        writer.write "--- condition and other rules ---"
-        writer.open_nesting
-        conditions_and_variants.each do |type, data|
-            writer.write "#{type}"
-            writer.open_nesting
-            data.each do |data_val, spells|
-                writer.write "#{data_val} : #{spells.join(', ')}"
+
+        writer.write "#{char_name} (#{player_name}), #{klass_levels.map{ |kl| kl.to_summary}.join(', ')}"
+        writer.with_nesting do
+            writer.write "--- Class Abilities ---"
+            writer.with_nesting do
+                writer.write abilities.map(&:name).join(', ')
             end
-            writer.close_nesting
-        end
-        writer.close_nesting
-        writer.close_nesting
-        
-        if spellcaster?
-            puts "--- Spellbooks ---"
-            writer.open_nesting
-            klass_levels.each do |kl|
-                next unless klass_abilities[kl.character_class].any? { |a| a.name.downcase == "spellcasting"}
-                writer.open_nesting
-                writer.write "--- For #{kl.klass_name} --- [#{spellbook(kl.character_class).spellbook_legend}]"
-                writer.open_nesting
-                # spellbook(kl.character_class).print_spellbook_stats(writer)
-                spellbook(kl.character_class).compact_list.each do |l|
-                    writer.write '^^^^^^^'
-                    writer.write l.to_compact_list
-                    writer.write l.to_compact_list_line_two
+            writer.write "--- Bonus Actions & Reactions ---"
+            writer.with_nesting do
+                writer.write "  Bonus: #{bonus_actions.map(&:name).join(', ')} | Reaction: #{reactions.map(&:name).join(', ')}"
+            end
+            writer.write "--- condition and other rules ---"
+            writer.with_nesting do
+                conditions_and_variants.each do |type, data|
+                    writer.write "#{type}"
+                    writer.with_nesting do
+                        data.each do |data_val, spells|
+                            writer.write "#{data_val} : #{spells.join(', ')}"
+                        end
+                    end
                 end
-                writer.close_nesting
-                writer.close_nesting
             end
-            writer.close_nesting
-        end
-        writer.close_nesting
+            if spellcaster?
+                writer.write "--- Spellbooks ---"
+                writer.with_nesting do
+                    klass_levels.each do |kl|
+                        next unless klass_abilities[kl.character_class].any? { |a| a.name.downcase == "spellcasting"}
+                        writer.with_nesting do
+                            writer.write "--- For #{kl.klass_name} --- [#{spellbook(kl.character_class).spellbook_legend}]"
+                            writer.with_nesting do
+                                spellbook(kl.character_class).print_spellbook_stats(writer)
+                                # spellbook(kl.character_class).compact_list.each do |l|
+                                    # writer.write '^^^^^^^'
+                                    # writer.write l.to_compact_list
+                                    # writer.write l.to_compact_list_line_two
+                                # end
+                            end
+                        end
+                    end
+                end
+            end
+        end        
     end
 end

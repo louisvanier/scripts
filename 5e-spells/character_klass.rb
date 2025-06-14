@@ -53,7 +53,7 @@ class CharacterKlass
 	end
 
     attr_accessor :primary_attribute, :hit_die_size, :saves_proficiency, :spellcasting_ability, :caster_progression,
-        :prepared_spells_change, :class_features, :conditions_and_variants, :character_class, :subclasses
+        :prepared_spells_change, :class_features, :conditions_and_variants, :character_class, :subclasses, :spell_progression
 
     def initialize(character_class, class_source = nil)
         @character_class = character_class
@@ -70,6 +70,8 @@ class CharacterKlass
         @caster_progression = @class_details["casterProgression"]
         @prepared_spells_change = @class_details["preparedSpellsChange"]
 		@wizard_like_spells_known = !@class_details["spellsKnownProgressionFixed"].nil?
+		spell_table = @class_details["classTableGroups"].find { |group| group["title"] == "Spell Slots per Spell Level" }
+		@spell_progression = spell_table["rowsSpellProgression"] unless spell_table.nil?
 
 		@class_features = []
 		@conditions_and_variants = Hash.new { |hash, type| hash[type] = Hash.new { |nested, data| nested[data] = [] }}
@@ -125,12 +127,13 @@ class CharacterKlass
 	end
 
     def spellbook_type
+		return :none if @prepared_spells_change.nil?
 		return @prepared_spells_change == 'level' ? :prepared_is_known :  @wizard_like_spells_known ? :prepares_from_book : :known_is_entire_list
     end
 end
 
 class SubKlass
-	attr_accessor :name, :short_name, :features
+	attr_accessor :name, :short_name, :features, :spell_progression
 
 	def initialize(subclass_entry, subclasses_features_list)
 		@name = subclass_entry["name"]
@@ -153,13 +156,24 @@ class SubKlass
 				@features << feature
 			end
 		end
+
+		spell_table = subclass_entry["subclassTableGroups"]&.find { |group| group["title"] == "Spell Slots per Spell Level" }
+		@spell_progression = spell_table["rowsSpellProgression"] unless spell_table.nil?
+
+		@prepared_spells_change = subclass_entry["preparedSpellsChange"]
+		@wizard_like_spells_known = !subclass_entry["spellsKnownProgressionFixed"].nil?
 	end
 
 	def extra_spells(levels = 1..20)
-		@features.find_all { |f| !f.extra_spells.empty? }.map do |f|
+		extra_spells = @features.find_all { |f| !f.extra_spells.empty? }.map do |f|
 			f.extra_spells.find_all { |level, _| levels.include?(level)}.map { |_, spells| spells }.flatten
 		end.flatten
+		extra_spells
 	end
+
+	def spellbook_type
+		return @prepared_spells_change == 'level' ? :prepared_is_known :  @wizard_like_spells_known ? :prepares_from_book : :known_is_entire_list
+    end
 end
 
 # also covers subclass features, its the same

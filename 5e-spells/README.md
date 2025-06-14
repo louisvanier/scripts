@@ -6,10 +6,11 @@ As of right now it supports spells from Tasha's Cauldron of Everything, The revi
 
 It should be able to also print a text only version of the spellbook that can then be formatted appropriately
 
+# Some classes and what they mean
+TODO => move some or most of this into actual documentation
+
 # Still To do
-* Correctly **automatically** grant always prepared spells from subclass features (such as oath spells for paladins or some sorcerer subclass)
-* correctly **automatically** grant extra spells in the available lists from subclass features (such as cleric domains)
-* detect max level of spells to get for a character sheet based on the actual class table rather than the old hard formula
+* move CharacterKlass, Subklass and KlassFeature parsing logic into some abstract layer
 * lookup conditions in the condition list to have a printable cheat sheet
 * maybe do the same thing with equipement at some point
 * move some queries to the party level (right now scraper uses a dumb array of characterSheets)
