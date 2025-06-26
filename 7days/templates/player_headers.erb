@@ -1,18 +1,30 @@
 <div class="d-flex flex-row">
     <% party.players.each do |player| %>
         <div class="p-3" style="width: 25%;">
-            <a class="d-inline-block" href="#player-<%= player.link_friendly_name %>">
+            <a class="d-inline-block h3" href="#player-<%= player.link_friendly_name %>">
                 <p><%= player.name %></p>
             </a>
-            <b><%= player.top_attributes[0][0] %></b> build <img width="48" height="48" src="./images/weapons<%= player.best_melee_skill['weapon'].gsub(' ', '_') %>.png"><img width="48" height="48" src="./images/weapons<%= player.best_ranged_skill['weapon'].gsub(' ', '_') %>.png">
+            <img width="48" height="48" src="./images/weapons<%= player.best_melee_skill['weapon'].gsub(' ', '_') %>.png"><img width="48" height="48" src="./images/weapons<%= player.best_ranged_skill['weapon'].gsub(' ', '_') %>.png">
             <div class="player-summary">
                 <div class="attribute-summary">
-                    <p> </p>
                     <p>
                     <% player.top_attributes.each do |att_name, details| %>
                         <b><%= att_name%></b>: <%= details['rating'] %>,
                     <% end %>
                     </p>
+                </div>
+                <div class="d-flex flex-column">
+                    <h3>Party Roles</h3>
+                    <% player.party_roles.each do |role, sources| %>
+                    <div class="d-flex flex-row flex-wrap">
+                        <%= render_template(role.downcase.gsub(' ', '_')) %>
+                        <% sources.each do |s| %>
+                            <p class="ms-1 me-1 text-small">
+                                <%= s %>
+                            </p>
+                        <% end%>
+                    </div>
+                    <% end%>
                 </div>
                 <div>
                     <hr />

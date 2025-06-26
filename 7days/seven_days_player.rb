@@ -8,40 +8,48 @@ class SevenDaysPlayer
           'team_roles' => ['gatherer'],
         },
         'luckylooter'=> {
-          'display_name' => 'Lucky Looter'
+          'display_name' => 'Lucky Looter',
+          'team_roles' => [],
         },
         'penetrator'=> {
-          'display_name' => 'Penetrator'
+          'display_name' => 'Penetrator',
+          'team_roles' => [],
         },
         'animaltracker'=> {
           'display_name' => 'Animal Tracker',
           'team_roles' => ['food supply'],
         },
         'infiltrator'=> {
-          'display_name' => 'Infiltrator'
+          'display_name' => 'Infiltrator',
+          'team_roles' => [],
         },
         'flurryofperception'=> {
-          'display_name' => 'Flurry of Perception'
+          'display_name' => 'Flurry of Perception',
+          'team_roles' => [],
         },
         'javelinmaster'=> {
           'fighting' => 'melee',
           'weapon' => 'spears',
           'wants_perk' => 'spearhunter',
-          'display_name' => 'Javelin Master'
+          'display_name' => 'Javelin Master',
+          'team_roles' => [],
         },
         'demolitionsexpert'=> {
           'fighting' => 'other',
           'weapon' => 'explosives',
-          'display_name' => 'Demolitions Expert'
+          'display_name' => 'Demolitions Expert',
+          'team_roles' => [],
         },
         'deadeye'=> {
           'fighting' => 'ranged',
           'weapon' => 'rifles',
           'wants_perk' => 'sniper',
-          'display_name' => 'Deadeye'
+          'display_name' => 'Deadeye',
+          'team_roles' => [],
         },
         'perceptionmastery' => {
-          'display_name' => 'Perception Mastery'
+          'display_name' => 'Perception Mastery',
+          'team_roles' => [],
         },
     }, 
     'strength' => {
@@ -58,118 +66,144 @@ class SevenDaysPlayer
           'team_roles' => ['food supply'],
         },
         'packmule'=> {
-          'display_name' => 'Pack Mule'
+          'display_name' => 'Pack Mule',
+          'team_roles' => [],
         },
         'heavyarmor'=> {
-          'display_name' => 'Heavy Armor'
+          'display_name' => 'Heavy Armor',
+          'team_roles' => [],
         },
         'flurryofstrength'=> {
-          'display_name' => 'Flurry of Strength'
+          'display_name' => 'Flurry of Strength',
+          'team_roles' => [],
         },
         'skullcrusher'=> {
           'fighting' => 'melee',
           'weapon' => 'sledges',
-          'display_name' => 'Skullcrusher'
+          'display_name' => 'Skullcrusher',
+          'team_roles' => [],
         },
         'pummelpete'=> {
           'fighting' => 'melee',
           'weapon' => 'clubs',
           'wants_perk' => 'batterup',
-          'display_name' => 'Pummel Pete'
+          'display_name' => 'Pummel Pete',
+          'team_roles' => [],
         },
         'boomstick'=> {
           'fighting' => 'ranged',
           'weapon' => 'shotguns',
           'wants_perk' => 'shotgunmessiah',
-          'display_name' => 'Boomstick'
+          'display_name' => 'Boomstick',
+          'team_roles' => [],
         },
         'strengthmastery' => {
-          'display_name' => 'Strength Mastery'
+          'display_name' => 'Strength Mastery',
+          'team_roles' => [],
         },
     }, 
     'fortitude' => {
         'ruleonecardio'=> {
-          'display_name' => 'Rule one: Cardio'
+          'display_name' => 'Rule one: Cardio',
+          'team_roles' => [],
         },
         'slowmetabolism'=> {
-          'display_name' => 'Slow Metabolism'
+          'display_name' => 'Slow Metabolism',
+          'team_roles' => [],
         },
         'healingfactor'=> {
-          'display_name' => 'Healing Factor'
+          'display_name' => 'Healing Factor',
+          'team_roles' => [],
         },
         'paintolerance'=> {
-          'display_name' => 'Pain Tolerance'
+          'display_name' => 'Pain Tolerance',
+          'team_roles' => [],
         },
         'livingofftheland'=> {
           'display_name' => 'Living of the Land',
           'team_roles' => ['food supply'],
         },
         'wellinsulated'=> {
-          'display_name' => 'Well Insulated'
+          'display_name' => 'Well Insulated',
+          'team_roles' => [],
         },
         'thehuntsman'=> {
           'display_name' => 'The Huntsman',
           'team_roles' => ['food supply'],
         },
         'flurryoffortitude'=> {
-          'display_name' => 'Flurry of Fortitude'
+          'display_name' => 'Flurry of Fortitude',
+          'team_roles' => [],
         },
         'machinegunner'=> {
           'fighting' => 'ranged',
           'weapon' => 'machine guns',
           'wants_perk' => 'autoweapons',
-          'display_name' => 'Machine Gunner'
+          'display_name' => 'Machine Gunner',
+          'team_roles' => [],
         },
         'brawler'=> {
           'fighting' => 'melee',
           'weapon' => 'knuckles',
           'wants_perk' => 'barbrawling',
-          'display_name' => 'Brawler'
+          'display_name' => 'Brawler',
+          'team_roles' => [],
         },
         'fortitudemastery' => {
-          'display_name' => 'Fortitude Mastery'
+          'display_name' => 'Fortitude Mastery',
+          'team_roles' => [],
         },
     }, 
     'agility' => {
         'fromtheshadows'=> {
-          'display_name' => 'From The Shadows'
+          'display_name' => 'From The Shadows',
+          'team_roles' => ['looter'],
         },
         'hiddenstrike'=> {
-          'display_name' => 'Hidden Strike'
+          'display_name' => 'Hidden Strike',
+          'team_roles' => ['looter'],
         },
         'parkour'=> {
-          'display_name' => 'Parkour'
+          'display_name' => 'Parkour',
+          'team_roles' => [],
         },
         'mediumarmor'=> {
-          'display_name' => 'Medium Armor'
+          'display_name' => 'Medium Armor',
+          'team_roles' => [],
         },
         'runandgun'=> {
-          'display_name' => 'Run And Gun'
+          'display_name' => 'Run And Gun',
+          'team_roles' => [],
         },
         'flurryofagility'=> {
-          'display_name' => 'Flurry of Agility'
+          'display_name' => 'Flurry of Agility',
+          'team_roles' => [],
         },
         'deepcuts'=> {
           'fighting' => 'melee',
           'weapon' => 'knives',
-          'display_name' => 'Deep Cuts'
+          'display_name' => 'Deep Cuts',
+          'team_roles' => [],
         },
         'gunslinger'=> {
           'fighting' => 'ranged',
           'weapon' => 'handguns',
           'wants_perk' => 'pistolpete',
-          'display_name' => 'Gunslinger'
+          'display_name' => 'Gunslinger',
+          'team_roles' => [],
         },
         'archery'=> {
           'fighting' => 'ranged',
           'weapon' => 'bows',
           'wants_perk' => 'rangers',
-          'display_name' => 'Archery'
+          'display_name' => 'Archery',
+          'team_roles' => [],
         },
     },
     'intellect' => {
         'lockpicking'=> {
-          'display_name' => 'Lock Picking'
+          'display_name' => 'Lock Picking',
+          'team_roles' => ['looter'],
         },
         'greasemonkey'=> {
           'display_name' => 'Grease Monkey',
@@ -184,39 +218,48 @@ class SevenDaysPlayer
           'team_roles' => ['healer'],
         },
         'charismaticnature'=> {
-          'display_name' => 'Charismatic Nature'
+          'display_name' => 'Charismatic Nature',
+          'team_roles' => [],
         },
         'daringadventurer'=> {
-          'display_name' => 'Daring Adventurer'
+          'display_name' => 'Daring Adventurer',
+          'team_roles' => [],
         },
         'betterbarter'=> {
-          'display_name' => 'Better Barter'
+          'display_name' => 'Better Barter',
+          'team_roles' => [],
         },
         'flurryofintellect'=> {
-          'display_name' => 'Flurry of Intellect'
+          'display_name' => 'Flurry of Intellect',
+          'team_roles' => [],
         },
         'turrets'=> {
           'fighting' => 'ranged',
           'weapon' => 'robotic turrets',
           'wants_perk' => 'techjunkie',
-          'display_name' => 'Robotics'
+          'display_name' => 'Robotics',
+          'team_roles' => [],
         },
         'electrocutioner'=> {
           'fighting' => 'melee',
           'weapon' => 'stun baton',
           'wants_perk' => 'techjunkie',
-          'display_name' => 'Electocutioner'
+          'display_name' => 'Electocutioner',
+          'team_roles' => [],
         },
     },
     'general' => {
       'lightarmor' => {
-        'display_name' => 'Light Armor'
+        'display_name' => 'Light Armor',
+        'team_roles' => [],
       },
       'mediumarmor' => {
-        'display_name' => 'Medium Armor'
+        'display_name' => 'Medium Armor',
+        'team_roles' => [],
       },
       'heavyarmor' => {
-        'display_name' => 'Heavy Armor'
+        'display_name' => 'Heavy Armor',
+        'team_roles' => [],
       },
       'masterchef' => {
         'display_name' => 'Master Chef',
@@ -227,10 +270,12 @@ class SevenDaysPlayer
         'team_roles' => ['food supply'],
       },
       'lockpicking' => {
-        'display_name' => 'Lockpicking'
+        'display_name' => 'Lockpicking',
+        'team_roles' => ['looter'],
       },
       'luckylooter' => {
-        'display_name' => 'Lucky Looter'
+        'display_name' => 'Lucky Looter',
+        'team_roles' => ['looter'],
       }
     }
     
@@ -397,6 +442,17 @@ class SevenDaysPlayer
   def wants_perk?(serie)
     return -1 if best_melee_skill['wants_perk'] == serie || best_ranged_skill['wants_perk'] == serie 
     return 0
+  end
+
+  def party_roles
+    roles = Hash.new { |k, v| k[v] = [] }
+    # find_all attributes spec with a party role and rating above 0
+    SevenDaysPlayer::ATTRIBUTES.map { |att_name, att_details| att_details  }
+      .reduce(&:merge)
+      .find_all { |spec_name, spec_details| attributes.any? { |att, specs| specs.any? { |spec, rating| spec == spec_name && rating > 0 } } && !spec_details['team_roles'].empty? }
+      .each { |spec_name, spec_details| spec_details['team_roles'].each { |r| roles[r] << "#{spec_details['display_name']}"}}
+
+    roles
   end
 
   def get_binding
