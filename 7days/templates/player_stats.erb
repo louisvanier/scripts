@@ -1,0 +1,49 @@
+<div class="player m-2" id="player-<%= link_friendly_name%>">
+    <h1>
+        <%= name %>
+    </h1>
+    <div class="attributes d-flex flex-column">
+        <% attributes.each do |att_name, att_values| %>
+            <div class="attribute-header">
+                <b class="attribute-title"><%= att_name%></b>: <span><%= att_values["rating"] %></span>
+            </div>
+            <div class="d-flex flex-row flex-wrap">   
+                <% SevenDaysPlayer::ATTRIBUTES[att_name].find_all { |s, _| att_values[s] && att_values[s] > 0 }.each do |spec, spec_details| %>
+                    <div class="ms-2 me-2 bg-dark text-white">
+                        <%= spec_details['display_name'] %> =&gt; <%= att_values[spec] %>
+                    </div>
+                <% end %>
+            </div>
+        <% end %>
+    </div>
+    <div class="crafting-skills">
+        <h3>Crafting</h3>
+        <div class="d-flex flex-row flex-wrap">
+            <% crafting_skills.sort{ |a,b| a <=> b }.each do |skill, rating| %>
+                <div class="ms-1 me-1" style="min-width: 100px;">
+                    <span class="crafting-skill-name"><%= SevenDaysParty::CRAFTING_SKILLS[skill]['display_name'] %></span></span>
+                    <div class="progress w-100">
+                        <div class="progress-bar" role="progressbar" style="min-width: 45px; width: <%= rating %>%;" aria-valuenow="<%= rating %>" aria-valuemin="0" aria-valuemax="<%= SevenDaysParty::CRAFTING_SKILLS[skill]['max_rank']  %>"><%= rating %>/<%= SevenDaysParty::CRAFTING_SKILLS[skill]['max_rank'] %></div>
+                    </div>
+                </div>
+            <% end%>
+        </div>
+    </div>
+    <div class="perk-magz">
+    <h3>Completing perk series</h3>
+            <% perk_magazines_reference.each do |serie, details| %>
+                <% if !has_completed_perk_serie?(serie) && details["issues"].any? { |iss| has_read_issue?(serie, iss) } %>
+                <div class="wanted-perk-magz ">
+                    <%= serie %>
+                </div>
+                <ul class="list-group list-group-horizontal">
+                    <% details["issues"].each_with_index do |issue, index| %>
+                        <li class="list-group-item">
+                            <span class="perk-issue <% if has_read_issue?(serie, issue) %>bg-success text-light<% end %>"><%= details["issues_display"][index] %></span>
+                        <li>
+                    <% end %>
+                </ul>
+                <% end %>
+            <% end %>
+    </div>
+</div>

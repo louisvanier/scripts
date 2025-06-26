@@ -1,0 +1,55 @@
+<div class="d-flex flex-row align-items-baseline">
+    <h2 class="">Perk Magazines (Team)</h2>
+    <p class="text-small ps-1"><small>click on a magazine series to view readership details of the party</small></p>
+</div>
+<div class="perk-magz">
+    <ul class="list-group list-group-horizontal">
+        <% party.completed_perks.each do |serie, details| %>
+            <li class="perk-seriez list-group-item">
+                <div>
+                    <img width="32" height="32" src="./images/<%= details["image_name"] %>">
+                    <span ><%= details["display_name"] %></span>
+                <div>
+            </li>
+        <% end%>
+    </ul>
+    <ul class="nav nav-tabs" role="tablist" id="incomplete-perks-tab">
+        <% party.incomplete_perks.each do |serie, details| %>
+            <li class="nav-item">
+                <button class="nav-link"id="<%= serie %>-tab" data-bs-toggle="tab" data-bs-target="#<%= serie %>-tab-pane" type="button" role="tab">
+                    <img width="32" height="32" src="./images/<%= details["image_name"] %>">
+                    <span ><%= details["display_name"] %></span>
+                </button>
+            </li>
+        <% end %>
+    </ul>
+    <div class="tab-content" id="incomplete-perks-tab-content">
+        <% party.incomplete_perks.each do |serie, details| %>
+            <div class="tab-pane fade" id="<%= serie %>-tab-pane" role="tabpanel">
+                <div class="d-flex flex-row flex-wrap">
+                    <% details["issues"].each_with_index do |issue, index| %>
+                        <div class="flex-fill">
+                            <p class="perk-issue ps-2 mb-1 <% if party.issue_done?(serie, issue) %>bg-success text-light<% end %>"><%= details["issues_display"][index] %></p>
+                            <% if !party.issue_done?(serie, issue) %>
+                                <ul class="list-group">
+                                    <% party.issue_wanted_by(serie, issue).each do |player| %>
+                                            <li class="list-group-item">
+                                                <%= player.name %>
+                                                <% if player.wants_perk?(serie) == -1 %>
+                                                    &nbsp;<span class="p-1 ps-2 pe-2 bg-primary text-white rounded-pill">Wanted for build</span>
+                                                <% end %>
+                                            </li>
+                                    <% end %>
+                                </ul>
+                            <% else %>
+                                <div class="bg-success text-light">
+                                    Complete!
+                                </div>
+                            <% end %>
+                        </div>
+                    <% end %>
+                </div>
+            </div>
+        <% end %>
+    </div>
+</div>

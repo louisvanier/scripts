@@ -1,0 +1,99 @@
+<div class="d-flex flex-row">
+    <% party.players.each do |player| %>
+        <div class="p-3" style="width: 25%;">
+            <a class="d-inline-block" href="#player-<%= player.link_friendly_name %>">
+                <p><%= player.name %></p>
+            </a>
+            <b><%= player.top_attributes[0][0] %></b> build <img width="48" height="48" src="./images/weapons<%= player.best_melee_skill['weapon'].gsub(' ', '_') %>.png"><img width="48" height="48" src="./images/weapons<%= player.best_ranged_skill['weapon'].gsub(' ', '_') %>.png">
+            <div class="player-summary">
+                <div class="attribute-summary">
+                    <p> </p>
+                    <p>
+                    <% player.top_attributes.each do |att_name, details| %>
+                        <b><%= att_name%></b>: <%= details['rating'] %>,
+                    <% end %>
+                    </p>
+                </div>
+                <div>
+                    <hr />
+                </div>
+                <h3>Crafting</h3>
+                <div class="crafting-summary">
+                    <p>completed</p>
+                    <div class="d-flex flex-row flex-wrap">
+                        <% party.all_crafting_skills_completed(player)&.each do |s, _| %>
+                            <div class="position-relative" style="width: 50px;">
+                                <img width="48" height="48" src="./images/crafting<%= s %>.png">
+                                <span class="position-absolute bottom-0 start-0 mt-2 me-2 text-white bg-success">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-check-circle" viewBox="0 0 16 16">
+                                        <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14m0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16"/>
+                                        <path d="m10.97 4.97-.02.022-3.473 4.425-2.093-2.094a.75.75 0 0 0-1.06 1.06L6.97 11.03a.75.75 0 0 0 1.079-.02l3.992-4.99a.75.75 0 0 0-1.071-1.05"/>
+                                    </svg>
+                                </span>
+                            </div>
+                        <% end %>
+                    </div>
+                </div>
+                <div class="crafting-summary">
+                    <p>Current leader in</p>
+                    <p>
+                        <ul class="list-unstyled">
+                        <% party.player_crafting_leader_in(player).sort { |(s1, _), (s2, _)| player.crafting_skills[s2] <=> player.crafting_skills[s1] }.each do |s, _| %>
+                            <li>
+                                <div class="container">
+                                    <div class="row">
+                                        <div class="col">
+                                            <img class="d-block" width="48" height="48" src="./images/crafting<%= s %>.png">
+                                        </div>
+                                        <div class="col-8 d-flex flex-column align-items-center">
+                                            <div>
+                                                <small><span class="text-small"><%= party.crafting_skills_reference(s)['display_name'] %></span></small>
+                                            </div>
+                                            <div class="progress w-100">
+                                                <div class="progress-bar" role="progressbar" style="min-width: 45px; width: <%= player.crafting_skills[s] %>%;" aria-valuenow="<%= player.crafting_skills[s] %>" aria-valuemin="0" aria-valuemax="<%= party.crafting_skills_reference(s)['max_rank']  %>"><%= player.crafting_skills[s] %>/<%= party.crafting_skills_reference(s)['max_rank']  %></div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </li>
+                        <% end %>
+                        </ul>
+                    </p>
+                </div>
+                <div>
+                    <hr />
+                </div>
+                <h3>Magazines</h3>
+                <div class="d-flex flex-row flex-wrap">
+                    <div>
+                        <p>Done</p>
+                        <div class="d-flex flex-row flex-wrap">
+                            <% party.all_magazines_completed(player)&.each do |s, details| %>
+                                <div class="position-relative" style="width: 50px;">
+                                    <img width="48" height="48" src="./images/<%= details["image_name"] %>" class="img-fluid">
+                                    <span class="position-absolute bottom-0 start-0 mt-2 me-2 text-white bg-success">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-check-circle" viewBox="0 0 16 16">
+                                            <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14m0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16"/>
+                                            <path d="m10.97 4.97-.02.022-3.473 4.425-2.093-2.094a.75.75 0 0 0-1.06 1.06L6.97 11.03a.75.75 0 0 0 1.079-.02l3.992-4.99a.75.75 0 0 0-1.071-1.05"/>
+                                        </svg>
+                                    </span>
+                                </div>
+                            <% end %>
+                        </div>
+                    </div>
+                    <% if (player.best_melee_skill['wants_perk'] && !player.has_completed_perk_serie?(player.best_melee_skill['wants_perk'])) || (player.best_ranged_skill['wants_perk'] && !player.has_completed_perk_serie?(player.best_ranged_skill['wants_perk'])) %>
+                        <div class="ps-3">
+                            <p>Wanted</p>
+                            <% if player.best_melee_skill['wants_perk'] && !player.has_completed_perk_serie?(player.best_melee_skill['wants_perk']) %>
+                                <img width="48" height="48" src="./images/<%= player.best_melee_skill['wants_perk'] %>.png">
+                            <% end %>
+                            <% if player.best_ranged_skill['wants_perk'] && !player.has_completed_perk_serie?(player.best_ranged_skill['wants_perk']) %>
+                                <img width="48" height="48" src="./images/<%= player.best_ranged_skill['wants_perk'] %>.png">
+                            <% end %>
+                        </div>
+                    <% end %>
+                </div>
+            </div>
+        </div>
+    <% end %>
+</div>

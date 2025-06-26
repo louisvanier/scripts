@@ -2,6 +2,6 @@
 #
 guard :shell do
 	watch('get_player_info.rb') do |m|
-		system("ruby #{m[0]} -p /mnt/nas_louis/Backup/Apocalice/Player")
+		system("ruby #{m[0]} -p ./")
 	end
 end

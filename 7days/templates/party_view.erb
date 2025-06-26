@@ -1,0 +1,10 @@
+<%=
+    render_template('header')
+%>
+<body>
+    <%= render_template('player_headers', party: party) %>
+    <%= render_template('perk_magazines', party: party) %>
+    <% party.players.each do |p| %>
+        <%= render_template_new_binding('player_stats', p.get_binding) %>
+    <% end %>
+</body>
