@@ -1,5 +1,5 @@
 class SevenDaysParty
-    attr_reader :players
+    attr_reader :players, :in_game_days, :in_game_hours
 
     PERK_MAGAZINES = {
         'artofmining' => {
@@ -260,8 +260,11 @@ class SevenDaysParty
         },
     }
 
-    def initialize(players)
+    def initialize(players, in_game_days = nil, in_game_hours = nil, server_config = nil)
         @players = players
+        @in_game_days = in_game_days
+        @in_game_hours = in_game_hours
+        @server_config = server_config
     end
 
     def issue_wanted_by(serie, issue)

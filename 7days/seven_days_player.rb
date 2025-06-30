@@ -7,8 +7,8 @@ class SevenDaysPlayer
           'display_name' => 'Salvage Operations',
           'team_roles' => ['gatherer'],
         },
-        'luckylooter'=> {
-          'display_name' => 'Lucky Looter',
+        'treasurehunter'=> {
+          'display_name' => 'Treasure Hunter',
           'team_roles' => [],
         },
         'penetrator'=> {
@@ -61,9 +61,9 @@ class SevenDaysPlayer
           'display_name' => 'Miner 69er',
           'team_roles' => ['gatherer'],
         },
-        'masterchef'=> {
-          'display_name' => 'Master Chef',
-          'team_roles' => ['food supply'],
+        'junkminer'=> {
+          'display_name' => 'Junk Miner',
+          'team_roles' => ['gatherer'],
         },
         'packmule'=> {
           'display_name' => 'Pack Mule',
@@ -80,7 +80,12 @@ class SevenDaysPlayer
         'skullcrusher'=> {
           'fighting' => 'melee',
           'weapon' => 'sledges',
+          'wants_perk' => 'sledgesaga',
           'display_name' => 'Skullcrusher',
+          'team_roles' => [],
+        },
+        'grandslam'=> {
+          'display_name' => 'Grand Slam',
           'team_roles' => [],
         },
         'pummelpete'=> {
@@ -119,20 +124,16 @@ class SevenDaysPlayer
           'display_name' => 'Pain Tolerance',
           'team_roles' => [],
         },
-        'livingofftheland'=> {
-          'display_name' => 'Living of the Land',
-          'team_roles' => ['food supply'],
-        },
-        'wellinsulated'=> {
-          'display_name' => 'Well Insulated',
-          'team_roles' => [],
-        },
         'thehuntsman'=> {
           'display_name' => 'The Huntsman',
           'team_roles' => ['food supply'],
         },
         'flurryoffortitude'=> {
           'display_name' => 'Flurry of Fortitude',
+          'team_roles' => [],
+        },
+        'siphoningstrikes'=> {
+          'display_name' => 'Siphoning Strikes',
           'team_roles' => [],
         },
         'machinegunner'=> {
@@ -167,12 +168,12 @@ class SevenDaysPlayer
           'display_name' => 'Parkour',
           'team_roles' => [],
         },
-        'mediumarmor'=> {
-          'display_name' => 'Medium Armor',
-          'team_roles' => [],
-        },
         'runandgun'=> {
           'display_name' => 'Run And Gun',
+          'team_roles' => [],
+        },
+        'hardtarget'=> {
+          'display_name' => 'Hard Target',
           'team_roles' => [],
         },
         'flurryofagility'=> {
@@ -201,14 +202,6 @@ class SevenDaysPlayer
         },
     },
     'intellect' => {
-        'lockpicking'=> {
-          'display_name' => 'Lock Picking',
-          'team_roles' => ['looter'],
-        },
-        'greasemonkey'=> {
-          'display_name' => 'Grease Monkey',
-          'team_roles' => ['tech'],
-        },
         'advancedengineering'=> {
           'display_name' => 'Advanced Engineering',
           'team_roles' => ['tech'],
@@ -276,7 +269,11 @@ class SevenDaysPlayer
       'luckylooter' => {
         'display_name' => 'Lucky Looter',
         'team_roles' => ['looter'],
-      }
+      },
+      'greasemonkey'=> {
+        'display_name' => 'Grease Monkey',
+        'team_roles' => ['tech'],
+      },
     }
     
   }
@@ -357,7 +354,7 @@ class SevenDaysPlayer
     def parse_save_file(reader)
       player = SevenDaysPlayer.new
       while (str = reader.get_str) && !reader.eof?
-        next if str.size < 4
+        next if str.size < 4 || !(str =~ /sledge2ndHit/).nil?
         if player.name.nil? && str.size >= 6
           player.name  = str
           # first string that matters is the name We use 6 as the min length for the name only. Something better could probably be tried 
@@ -407,40 +404,56 @@ class SevenDaysPlayer
     @top_attributes ||= @attributes.find_all{ |_, details| !details['rating'].nil? }.sort { |(_, details1), (_, details2)| details2['rating'] <=> details1['rating'] }.take(3)
   end
 
-  def best_melee_skill
-    best_value = 0
-    best_spec_details = nil
+  def best_melee_skill_rating
+    best_melee_skill
+    @best_value
+  end
 
-    ATTRIBUTES.each do |att, details|
-      details.find_all { |att_spec, spec_details| spec_details['fighting'] == "melee" }.each do |spec, det|
-        if attributes[att][spec] > best_value
-          best_spec_details = details[spec]
-          best_value = attributes[att][spec]
+  def best_melee_skill
+    if !defined?(@best_value)
+      @best_value = 0
+      @best_spec_details = nil
+
+      ATTRIBUTES.each do |att, details|
+        details.find_all { |att_spec, spec_details| spec_details['fighting'] == "melee" }.each do |spec, det|
+          if attributes[att][spec] > @best_value
+            @best_spec_details = details[spec]
+            @best_value = attributes[att][spec]
+          end
         end
       end
-    end
 
-    best_spec_details
+      
+    end
+    @best_spec_details
+  end
+
+  def best_ranged_skill_rating
+    best_ranged_skill
+    @best_ranged_value
   end
 
   def best_ranged_skill
-    best_value = 0
-    best_spec_details = nil
+    if !defined?(@best_ranged_value)
+      @best_ranged_value = 0
+      @best__ranged_spec_details = nil
 
-    ATTRIBUTES.each do |att, details|
-      details.find_all { |att_spec, spec_details| spec_details['fighting'] == "ranged" }.each do |spec, det|
-        if attributes[att][spec] > best_value
-          best_spec_details = details[spec]
-          best_value = attributes[att][spec]
+      ATTRIBUTES.each do |att, details|
+        details.find_all { |att_spec, spec_details| spec_details['fighting'] == "ranged" }.each do |spec, det|
+          if attributes[att][spec] > @best_ranged_value
+            @best__ranged_spec_details = details[spec]
+            @best_ranged_value = attributes[att][spec]
+          end
         end
       end
-    end
 
-    best_spec_details
+      
+    end
+    @best__ranged_spec_details
   end
   
   def wants_perk?(serie)
-    return -1 if best_melee_skill['wants_perk'] == serie || best_ranged_skill['wants_perk'] == serie 
+    return -1 if (!best_melee_skill.nil? &&  best_melee_skill['wants_perk'] == serie) || (!best_ranged_skill.nil? && best_ranged_skill['wants_perk'] == serie )
     return 0
   end
 
@@ -451,6 +464,9 @@ class SevenDaysPlayer
       .reduce(&:merge)
       .find_all { |spec_name, spec_details| attributes.any? { |att, specs| specs.any? { |spec, rating| spec == spec_name && rating > 0 } } && !spec_details['team_roles'].empty? }
       .each { |spec_name, spec_details| spec_details['team_roles'].each { |r| roles[r] << "#{spec_details['display_name']}"}}
+
+      SevenDaysParty::CRAFTING_SKILLS.find_all { |skill, details| !details['team_roles'].nil? && @crafting_skills[skill] > (details['max_rank'] / 4) }
+        .each { |skill, details| details['team_roles'].each { |r| roles[r] << "#{details['display_name']} @ #{@crafting_skills[skill]}"} }
 
     roles
   end

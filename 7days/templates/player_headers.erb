@@ -1,13 +1,31 @@
 <div class="d-flex flex-row">
     <% party.players.each do |player| %>
         <div class="p-3" style="width: 25%;">
-            <a class="d-inline-block h3" href="#player-<%= player.link_friendly_name %>">
-                <p><%= player.name %></p>
-            </a>
-            <img width="48" height="48" src="./images/weapons<%= player.best_melee_skill['weapon'].gsub(' ', '_') %>.png"><img width="48" height="48" src="./images/weapons<%= player.best_ranged_skill['weapon'].gsub(' ', '_') %>.png">
+            <div class="d-flex flex-row flex-wrap">
+                <a class="d-inline-block h3" href="#player-<%= player.link_friendly_name %>">
+                    <p><%= player.name %></p>
+                </a>
+                <% unless player.best_melee_skill.nil? %>
+                    <div class="position-relative" style="width: 50px;">
+                        <img width="48" height="48" src="./images/weapons<%= player.best_melee_skill['weapon'].gsub(' ', '_') %>.png">
+                        <span class="position-absolute bottom-0 start-0 mt-2 me-2 text-white bg-primary">
+                            <%= render_template("notif_#{player.best_melee_skill_rating}") %>
+                        </span>
+                    </div>
+                <% end %>
+                <% unless player.best_ranged_skill.nil? %>
+                    <div class="position-relative" style="width: 50px;">
+                        <img width="48" height="48" src="./images/weapons<%= player.best_ranged_skill['weapon'].gsub(' ', '_') %>.png">
+                        <span class="position-absolute bottom-0 start-0 mt-2 me-2 text-white bg-primary">
+                            <%= render_template("notif_#{player.best_ranged_skill_rating}") %>
+                        </span>
+                    </div>
+                <% end %>
+            </div>
             <div class="player-summary">
                 <div class="attribute-summary">
                     <p>
+                <% pp "here 0.1" %>
                     <% player.top_attributes.each do |att_name, details| %>
                         <b><%= att_name%></b>: <%= details['rating'] %>,
                     <% end %>
@@ -15,12 +33,16 @@
                 </div>
                 <div class="d-flex flex-column">
                     <h3>Party Roles</h3>
+                <% pp "here 1.0" %>
                     <% player.party_roles.each do |role, sources| %>
                     <div class="d-flex flex-row flex-wrap">
                         <%= render_template(role.downcase.gsub(' ', '_')) %>
-                        <% sources.each do |s| %>
+                        <% sources.each_with_index do |s, i| %>
                             <p class="ms-1 me-1 text-small">
                                 <%= s %>
+                                <% if i != sources.size - 1 %>
+                                    <%= ", " %>
+                                <% end %>
                             </p>
                         <% end%>
                     </div>
@@ -93,13 +115,13 @@
                             <% end %>
                         </div>
                     </div>
-                    <% if (player.best_melee_skill['wants_perk'] && !player.has_completed_perk_serie?(player.best_melee_skill['wants_perk'])) || (player.best_ranged_skill['wants_perk'] && !player.has_completed_perk_serie?(player.best_ranged_skill['wants_perk'])) %>
+                    <% if (!player.best_melee_skill.nil? && player.best_melee_skill['wants_perk'] && !player.has_completed_perk_serie?(player.best_melee_skill['wants_perk'])) || (!player.best_ranged_skill.nil? && player.best_ranged_skill['wants_perk'] && !player.has_completed_perk_serie?(player.best_ranged_skill['wants_perk'])) %>
                         <div class="ps-3">
                             <p>Wanted</p>
-                            <% if player.best_melee_skill['wants_perk'] && !player.has_completed_perk_serie?(player.best_melee_skill['wants_perk']) %>
+                            <% if !player.best_melee_skill.nil? && player.best_melee_skill['wants_perk'] && !player.has_completed_perk_serie?(player.best_melee_skill['wants_perk']) %>
                                 <img width="48" height="48" src="./images/<%= player.best_melee_skill['wants_perk'] %>.png">
                             <% end %>
-                            <% if player.best_ranged_skill['wants_perk'] && !player.has_completed_perk_serie?(player.best_ranged_skill['wants_perk']) %>
+                            <% if !player.best_ranged_skill.nil? && player.best_ranged_skill['wants_perk'] && !player.has_completed_perk_serie?(player.best_ranged_skill['wants_perk']) %>
                                 <img width="48" height="48" src="./images/<%= player.best_ranged_skill['wants_perk'] %>.png">
                             <% end %>
                         </div>

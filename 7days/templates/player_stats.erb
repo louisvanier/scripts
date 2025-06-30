@@ -10,7 +10,7 @@
             <div class="d-flex flex-row flex-wrap">   
                 <% SevenDaysPlayer::ATTRIBUTES[att_name].find_all { |s, _| att_values[s] && att_values[s] > 0 }.each do |spec, spec_details| %>
                     <div class="ms-2 me-2 bg-dark text-white">
-                        <%= spec_details['display_name'] %> =&gt; <%= att_values[spec] %>
+                        <%= spec_details['display_name'] %> @ <%= att_values[spec] %>
                     </div>
                 <% end %>
             </div>

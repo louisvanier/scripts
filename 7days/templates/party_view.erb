@@ -2,9 +2,16 @@
     render_template('header')
 %>
 <body>
+    <div>
+        Page generated on <%= Time.now.getlocal("-04:00") %>. Refreshes every 5m
+    </div>
+    <% if !party.in_game_days.nil? %>
+        <h3>Approximate game time: Day <%= party.in_game_days %> hour <%= party.in_game_hours %></h3>
+    <% end %>
     <%= render_template('player_headers', party: party) %>
     <%= render_template('perk_magazines', party: party) %>
     <% party.players.each do |p| %>
         <%= render_template_new_binding('player_stats', p.get_binding) %>
     <% end %>
+
 </body>

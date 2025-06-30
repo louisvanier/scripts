@@ -5,7 +5,7 @@ class ErbRenderer
     end
 
     def infer_template_path(template_name)
-        "./templates/#{template_name}.erb"
+        "#{__dir__}/templates/#{template_name}.erb"
     end
 
     def get_binding
