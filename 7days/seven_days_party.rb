@@ -1,5 +1,5 @@
 class SevenDaysParty
-    attr_reader :players, :in_game_days, :in_game_hours
+    attr_reader :players, :server_config
 
     PERK_MAGAZINES = {
         'artofmining' => {
@@ -260,11 +260,111 @@ class SevenDaysParty
         },
     }
 
-    def initialize(players, in_game_days = nil, in_game_hours = nil, server_config = nil)
+    SERVER_CONFIGS = {
+        'ZOMBIE_SPEEDS' => {
+            0 => 'walk',
+            1 => 'jog',
+            2 => 'sprint',
+            3 => 'run'
+        },
+        'BlockDamagePlayer' => {
+            'display_name' => 'Player Block Damage',
+            'value_type' => 'percentage'
+        },
+        'BlockDamageAI' => {
+            'display_name' => 'Zeds Block Damage',
+            'value_type' => 'percentage'
+        },
+        'BlockDamageAIBM' => {
+            'display_name' => 'BM Block Damage',
+            'value_type' => 'percentage'
+        },
+        'XPMultiplier' => {
+            'display_name' => 'XP',
+            'value_type' => 'percentage'
+        },
+        'DayNightLength' => {
+            'display_name' => 'Day real-time',
+            'value_type' => 'minutes'
+        },
+        'DayLightLength' => {
+            'display_name' => 'In-game day',
+            'value_type' => 'hours'
+            
+        },
+        'EnemyDifficulty' => {
+            'display_name' => 'Difficulty',
+            'value_type' => ''
+        },
+        'ZombieFeralSense' => {
+            'display_name' => 'Feral sense',
+            'value_type' => ''
+        },
+        'ZombieMove' => {
+            'display_name' => 'Zeds speed',
+            'value_type' => 'zombie_speed'
+        },
+        'ZombieMoveNight' => {
+            'display_name' => 'Zeds night speed',
+            'value_type' => 'zombie_speed'
+        },
+        'ZombieFeralMove' => {
+            'display_name' => 'Zeds feral speed',
+            'value_type' => 'zombie_speed'
+        },
+        'ZombieBMMove' => {
+            'display_name' => 'Zeds Blood Moon speed',
+            'value_type' => 'zombie_speed'
+        },
+        'BloodMoonFrequency' => {
+            'display_name' => 'BM Nights',
+            'value_type' => 'days'
+        },
+        'BloodMoonRange' => {
+            'display_name' => 'BM +/-',
+            'value_type' => 'days'
+        },
+        'BloodMoonWarning' => {
+            'display_name' => 'BM Warning time',
+            'value_type' => 'hour'
+        },
+        'BloodMoonEnemyCount' => {
+            'display_name' => 'BM Zeds',
+            'value_type' => '/ player'
+        },
+        'LootAbundance' => {
+            'display_name' => 'Loot',
+            'value_type' => 'percentage'
+        },
+        'LootRespawnDays' => {
+            'display_name' => 'respawn',
+            'value_type' => 'days'
+        },
+        'AirDropFrequency' => {
+            'display_name' => 'Air drops',
+            'value_type' => 'days',
+        },
+    }
+
+    def initialize(players, server_config = nil)
         @players = players
-        @in_game_days = in_game_days
-        @in_game_hours = in_game_hours
         @server_config = server_config
+
+        Log.instance.warn @server_config unless server_config.nil?
+    end
+
+    def relevant_server_configs
+        # TODO correctly map the funny server config to its actual name
+        @server_config.find_all { |k, v| k != 'in_game_days' && k != 'in_game_hours' }.map { |k, v| [SERVER_CONFIGS[k]['display_name'], server_config_value_to_s(v, SERVER_CONFIGS[k]['value_type'])]}.to_h
+    end
+
+    def server_config_value_to_s(value, value_type)
+        case value_type
+        when 'percentage' then return "#{value}%"
+        when 'zombie_speed' then return SERVER_CONFIGS['ZOMBIE_SPEEDS'][value]
+        when 'days' && value == 0 then return "disabled"
+        else return "#{value} #{value_type}"
+        end
     end
 
     def issue_wanted_by(serie, issue)

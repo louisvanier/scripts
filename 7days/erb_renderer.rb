@@ -24,7 +24,7 @@ class ErbRenderer
     end
 
     def render_template(template_name, **locals)
-        pp "rendering #{template_name}, args name are #{locals.keys}"
+        Log.instance.info "rendering #{template_name}, args name are #{locals.keys}"
         @locals = @locals.merge(locals)
         template = ERB.new(File.open(infer_template_path(template_name), 'rb', &:read))
         exit("Could not find template for #{template_name}") if template.nil?

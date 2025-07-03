@@ -25,7 +25,6 @@
             <div class="player-summary">
                 <div class="attribute-summary">
                     <p>
-                <% pp "here 0.1" %>
                     <% player.top_attributes.each do |att_name, details| %>
                         <b><%= att_name%></b>: <%= details['rating'] %>,
                     <% end %>
@@ -33,7 +32,6 @@
                 </div>
                 <div class="d-flex flex-column">
                     <h3>Party Roles</h3>
-                <% pp "here 1.0" %>
                     <% player.party_roles.each do |role, sources| %>
                     <div class="d-flex flex-row flex-wrap">
                         <%= render_template(role.downcase.gsub(' ', '_')) %>
@@ -52,22 +50,24 @@
                     <hr />
                 </div>
                 <h3>Crafting</h3>
-                <div class="crafting-summary">
-                    <p>completed</p>
-                    <div class="d-flex flex-row flex-wrap">
-                        <% party.all_crafting_skills_completed(player)&.each do |s, _| %>
-                            <div class="position-relative" style="width: 50px;">
-                                <img width="48" height="48" src="./images/crafting<%= s %>.png">
-                                <span class="position-absolute bottom-0 start-0 mt-2 me-2 text-white bg-success">
-                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-check-circle" viewBox="0 0 16 16">
-                                        <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14m0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16"/>
-                                        <path d="m10.97 4.97-.02.022-3.473 4.425-2.093-2.094a.75.75 0 0 0-1.06 1.06L6.97 11.03a.75.75 0 0 0 1.079-.02l3.992-4.99a.75.75 0 0 0-1.071-1.05"/>
-                                    </svg>
-                                </span>
-                            </div>
-                        <% end %>
+                <% if !party.all_crafting_skills_completed(player).empty? %>
+                    <div class="crafting-summary">
+                        <p>completed</p>
+                        <div class="d-flex flex-row flex-wrap">
+                            <% party.all_crafting_skills_completed(player).each do |s, _| %>
+                                <div class="position-relative" style="width: 50px;">
+                                    <img width="48" height="48" src="./images/crafting<%= s %>.png">
+                                    <span class="position-absolute bottom-0 start-0 mt-2 me-2 text-white bg-success">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-check-circle" viewBox="0 0 16 16">
+                                            <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14m0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16"/>
+                                            <path d="m10.97 4.97-.02.022-3.473 4.425-2.093-2.094a.75.75 0 0 0-1.06 1.06L6.97 11.03a.75.75 0 0 0 1.079-.02l3.992-4.99a.75.75 0 0 0-1.071-1.05"/>
+                                        </svg>
+                                    </span>
+                                </div>
+                            <% end %>
+                        </div>
                     </div>
-                </div>
+                <% end %>
                 <div class="crafting-summary">
                     <p>Current leader in</p>
                     <p>

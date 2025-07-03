@@ -5,9 +5,18 @@
     <div>
         Page generated on <%= Time.now.getlocal("-04:00") %>. Refreshes every 5m
     </div>
-    <% if !party.in_game_days.nil? %>
-        <h3>Approximate game time: Day <%= party.in_game_days %> hour <%= party.in_game_hours %></h3>
-    <% end %>
+    
+        <% if !party.server_config.nil? %>
+            <h3>Approximate game time: Day <%= party.server_config['in_game_days'] %> hour <%= party.server_config['in_game_hours'] %></h3>
+            <div class="d-flex flex-row flex-wrap fs-6">
+                <% party.relevant_server_configs.each do |name, value| %>
+                    <div class="ps-1">
+                        <b><%= name %></b> @ <%= value %>
+                    </div>
+                <% end %>
+            </div>
+        <% end %>
+    
     <%= render_template('player_headers', party: party) %>
     <%= render_template('perk_magazines', party: party) %>
     <% party.players.each do |p| %>

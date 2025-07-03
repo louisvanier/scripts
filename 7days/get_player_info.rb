@@ -2,14 +2,29 @@ require 'pathname'
 require 'optparse'
 require 'logger'
 require 'erb'
+require 'net-telnet'
 
 require_relative './binary_file_reader'
 require_relative './erb_renderer'
 require_relative './seven_days_party'
 require_relative './seven_days_player'
 
-@logger ||= Logger.new(STDOUT)
-@logger.level = Logger::WARN
+
+IN_GAME_HOUR_DURATION = 915
+IN_GAME_DAY_DURATION = IN_GAME_HOUR_DURATION * 24
+
+
+class Log
+  class << self
+    def instance
+      if !defined?(@logger)
+        @logger = Logger.new(STDOUT)
+        @logger.level = Logger::WARN
+      end
+      @logger
+    end
+  end
+end
 
 params = {
   :'player-save-files-path' => './',
@@ -53,20 +68,24 @@ end
 game_days = nil
 game_hours = nil
 server_config = nil
+Log.instance.info "received server address: #{params[:'server-address']}, port: #{params[:'telnet-port']}"
 if params[:'server-address'] && params[:'telnet-port']
-  pp "trying to read server config via telnet: #{params[:'server-address']} #{params[:'telnet-port']}"
-  telnet_output = `telnet #{params[:'server-address']} #{params[:'telnet-port']}`
+  telnet_output = ''
+  telnet_conn = Net::Telnet::new('Host' => params[:'server-address'], 'Port' => params[:'telnet-port'], 'Timeout' => 10)
+  telnet_conn.cmd("") { |c| Log.instance.warn(c); telnet_output = c }
+  Log.instance.info "trying to read server config via telnet: #{params[:'server-address']} #{params[:'telnet-port']}"
+  server_config = parse_telnet_server_config(telnet_output)
+  
+  
   if (matches = telnet_output.match(/CurrentServerTime:(\d+);/))
     server_in_game_days = matches[1].to_i
-    game_days = server_in_game_days / 21240 # TODO calculate the proper DIVISOR but this should be roughly accurate
-    game_hours = (server_in_game_days % 21240) / 885 # TODO calculate the proper DIVISOR but this should be roughly accurate
-    pp "found server at game time #{server_in_game_days}"
+    server_config['in_game_days'] = server_in_game_days / IN_GAME_DAY_DURATION # TODO calculate the proper DIVISOR but this should be roughly accurate
+    server_config['in_game_hours'] = (server_in_game_days % IN_GAME_DAY_DURATION) / IN_GAME_HOUR_DURATION # TODO calculate the proper DIVISOR but this should be roughly accurate
   end
-  server_config = parse_telnet_server_config(telnet_output)
 end
 
 
-party = SevenDaysParty.new(players, game_days, game_hours, server_config)
+party = SevenDaysParty.new(players, server_config)
 
 open(params[:'output-path'], 'w') do |f|
   f << ErbRenderer.new.render_template('party_view', party: party)
