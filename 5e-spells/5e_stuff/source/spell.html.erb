@@ -1,0 +1,14 @@
+<div>
+  <h6 class="border-bottom border-3 mt-2 mb-0">
+    <%= spell.level_to_s %> - <%= spell.name %> (<%= spell.school_name %>)<%= spell.scales_at_higher_level? ? ", *Scales* " : "" %><%= !spell.damage_types.nil? ? spell.damage_types.map { |dt| Spellbook::DAMAGE_TYPES_EMOJI_MAP[dt] }.join(' / ') : '' %>
+  </h6>
+  <div class="d-flex flex-row flex-wrap border-bottom border-3">
+    <div class="pe-4"><b>Components : </b><%= spell.components_to_s %></div>
+    <div class="pe-4"><b>Duration : </b><%= spell.duration_to_s %></div>
+    <div class="pe-4"><b>Range : </b><%= spell.range_to_s %></div>
+    <div class="pe-4"><b>Casting Time : </b><%= spell.casting_time %></div>
+  </div>
+  <div class="border-bottom border-3 border-dark mb-2">
+    <%= spell.adjusted_description %>
+  </div>
+</div>

@@ -1,20 +1,15 @@
-
-
-
 class Scraper
-  BASE_URL = "https://5e.tools/data/spells"
-  LOCAL_DIR = "data"
-  SPELLS_DATA_PREFIX = "spells-"
-  CLASSES_PREFIX = "class-"
+  BASE_URL = 'https://5e.tools/data/spells'
+  LOCAL_DIR = 'data'
+  SPELLS_DATA_PREFIX = 'spells-'
+  CLASSES_PREFIX = 'class-'
   KNOWN_NO_SPELLS_SOURCES = ['dsotdq']
 
   class << self
     def instance
-      if !defined?(@instance)
-        @instance = Scraper.new
-      end
+      @instance = Scraper.new unless defined?(@instance)
 
-      return @instance
+      @instance
     end
 
     def log_level
@@ -22,7 +17,7 @@ class Scraper
     end
 
     def logger
-      if !defined?(@logger)
+      unless defined?(@logger)
         @logger = Logger.new(STDOUT)
         @logger.level = log_level
       end
@@ -30,15 +25,15 @@ class Scraper
     end
   end
 
-  def initialize()
+  def initialize
     @spell_sources = {}
     @character_classes = {}
     FileUtils.mkdir_p(LOCAL_DIR)
   end
 
   def get_spell_lists
-    if !defined?(@spell_lists)
-        @spell_lists = load_or_download(File.join(LOCAL_DIR, "#{SPELLS_DATA_PREFIX}lists.json"), "")
+    unless defined?(@spell_lists)
+      @spell_lists = load_or_download(File.join(LOCAL_DIR, "#{SPELLS_DATA_PREFIX}lists.json"), '')
     end
 
     @spell_lists
@@ -46,14 +41,15 @@ class Scraper
 
   def get_spell_source(source)
     if !@spell_sources.key?(source) && !KNOWN_NO_SPELLS_SOURCES.include?(source)
-        @spell_sources[source] = SpellSource.new(load_or_download(File.join(LOCAL_DIR, "#{SPELLS_DATA_PREFIX}#{source}.json"), source), source)
+      @spell_sources[source] =
+        SpellSource.new(load_or_download(File.join(LOCAL_DIR, "#{SPELLS_DATA_PREFIX}#{source}.json"), source), source)
     end
     @spell_sources[source]
   end
 
   def get_character_class(cls)
-    if !@character_classes.key?(cls)
-        @character_classes[cls] = load_or_download(File.join(LOCAL_DIR, "#{CLASSES_PREFIX}#{cls}.json"), cls)
+    unless @character_classes.key?(cls)
+      @character_classes[cls] = load_or_download(File.join(LOCAL_DIR, "#{CLASSES_PREFIX}#{cls}.json"), cls)
     end
     @character_classes[cls]
   end
@@ -80,10 +76,10 @@ class Scraper
 
   def fake_headers
     {
-      "User-Agent" => "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36",
-      "Accept" => "application/json, text/plain, */*",
-      "Accept-Language" => "en-US,en;q=0.9",
-      "Referer" => "https://5e.tools/spells.html"
+      'User-Agent' => 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36',
+      'Accept' => 'application/json, text/plain, */*',
+      'Accept-Language' => 'en-US,en;q=0.9',
+      'Referer' => 'https://5e.tools/spells.html'
     }
   end
 end

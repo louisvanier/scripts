@@ -1,0 +1,45 @@
+<div >
+  <h6><%= spellbook_for %> spells</h6>
+  <h6>Summary</h6>
+  <div><b>damage types</b></div>
+    <% spellbook.damage_types.each do |type, spells| %>
+    <div>
+        <%= type %> : <%= spells.sort.map { |s| "#{s.name} - #{s.level}" }.join(', ') %>
+  </div>
+<% end %>
+  <div><b>saves targeted</b></div>
+<% spellbook.saves.each do |type, spells| %>
+  <div>
+    <%= type %> : <%= spells.sort.map { |s| "#{s.name} - #{s.level}" }.join(', ') %>
+  </div>
+<% end %>
+<% if spellbook.bonus_actions.size > 0 %>
+  <div><b>bonus action spells</b></div>
+  <%= spellbook.bonus_actions.map { |s| "#{s.name} - #{s.level}" }.join(', ') %>
+<% end %>
+<% if spellbook.reactions.size > 0 %>
+  <div><b>reaction spells</b></div>
+  <%= spellbook.reactions.map { |s| "#{s.name} - #{s.level}" }.join(', ') %>
+<% end %>
+  <h6>Legend</h6>
+  <div>
+    * - The spell can scale with higher level spell slots
+  </div>
+  <div>
+    (C) - The spell requires Concentration
+  </div>
+  <% spellbook.unique_damage_types.each do |s| %>
+    <div>
+      <%= s %> : <%= Spellbook::DAMAGE_TYPES_EMOJI_MAP.invert[s] %>
+    </div>
+  <% end %>
+  <% spellbook.unique_targeted_saves.each do |s| %>
+    <div>
+      <%= s %> : <%= CharacterKlass::ATTRIBUTES_EMOJI_MAP.invert[s] %>
+    </div>
+  <% end %>
+  <h6>Details</h6>
+  <% spellbook.spells.each do |spell| %>
+    <%= partial "spell", locals: { spell: spell } %>
+  <% end %>
+</div>

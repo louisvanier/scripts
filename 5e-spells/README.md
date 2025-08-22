@@ -11,9 +11,17 @@ TODO => move some or most of this into actual documentation
 
 # Still To do
 * move CharacterKlass, Subklass and KlassFeature parsing logic into some abstract layer
+* move logger to main
+* use some sort of string format for spells
+* get spell slots for spellcaster
+    * see about spellslots with multiclasses
+* scan all abilities of class + subclass to see if we can find expendable resources (per rest, )
 * lookup conditions in the condition list to have a printable cheat sheet
 * maybe do the same thing with equipement at some point
 * move some queries to the party level (right now scraper uses a dumb array of characterSheets)
 
 # Random notes
 The usage of `Klass` in names instead of `Class` is because we live in an object oriented world and `Class` is a keyword and I want to be unambiguous
+
+# Rendering HTML and even printable version of stuff
+Uses the middleman gem to generate some templates. See https://middlemanapp.com/basics/start-new-site as to how this started

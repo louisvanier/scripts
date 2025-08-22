@@ -1,0 +1,51 @@
+<h1>
+  <%= character.char_name %>
+</h1>
+<div>
+  <%= character.player_name %>, <%= character.klass_levels.map { |kl| kl.to_summary }.join(', ') %>
+</div>
+<div>
+  <h5>Class Abilities</h5>
+  <% character.abilities.each do |ability| %>
+    <div>
+      <%= ability.name %>
+    </div>
+  <% end %>
+</div>
+<div>
+  <h5>Bonus Actions</h5>
+  <% character.bonus_actions.each do |bonus| %>
+    <div>
+      <%= bonus.name %>
+    </div>
+  <% end %>
+</div>
+<div>
+  <h5>Reactions</h5>
+  <% character.reactions.each do |reaction| %>
+    <div>
+      <%= reaction.name %>
+    </div>
+  <% end %>
+</div>
+<div>
+  <h5>Rules implied</h5>
+  <% character.conditions_and_variants.each do |type, data| %>
+    <div>
+      <div><%= type %></div>
+      <% data.each do |data_val, spells| %>
+        <div><%= data_val %> : <%= spells.join(', ') %></div>
+      <% end %>
+    </div>
+  <% end %>
+</div>
+<% if character.spellcaster? %>
+  <div>
+    <h5>Spellbooks</h5>
+    <div class="d-flex flex-wrap fs-6">
+    <% character.spellcasting_klass_levels.each do |kl| %>
+      <%= partial "spellbook", locals: { spellbook_for: kl.klass_name, spellbook: character.spellbook(kl.character_class) } %>
+    <% end %>
+    </div>
+ </div>
+<% end %>
